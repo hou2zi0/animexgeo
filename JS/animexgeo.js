@@ -13,6 +13,12 @@ function mapIt() {
       case 'textarea':
         paragraph.innerHTML = `<label for="${object.htmlId}">${object.label}</label>:<br/><textarea id="poly-${object.htmlId}" name="${object.htmlId}" rows="3" wrap="hard" style="width:100%;">Freitextfeld</textarea>`;
         break;
+      case 'dropdown':
+        paragraph.innerHTML = `<strong>${object.label}</strong><select id="poly-${object.htmlId}">
+        <option value="">--Select an option--</option>
+        ${object.value.split(',').map(item => { return `<option value="${item.trim()}">${item.trim()}</option>`}).join('\n')}
+        </select>`;
+        break;
     }
     fieldset.appendChild(paragraph);
   }); //<textarea id="advanced" name="advanced" rows="3" cols="33" maxlength="200" wrap="hard">
