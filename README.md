@@ -23,7 +23,7 @@ Then:
 * Repeat the above.
 * Click ‘Export JSON’ to retrieve the array of GeoJSON objects.
 
-A live example may be found [https://hou2zi0.github.io/animexgeo/HTML/animexgeo.html](here).
+A live example may be found [here](https://hou2zi0.github.io/animexgeo/HTML/animexgeo.html).
 
 ### Configuration file
 
@@ -91,7 +91,8 @@ const POLY_METADATA = [{
 
 # To Do
 
-* Provide point and multy polygon annotation.
+* Provide point and multi polygon annotation.
+* Allow adjustment of polygon edges via mouse click and drag.
 * Bundle into Electron application.
 * Bundle into Atom plugin.
 
