@@ -6,18 +6,22 @@ function mapIt() {
     const paragraph = document.createElement('p');
 
     switch (object.type) {
+      // text input
       case 'text':
         paragraph.innerHTML = `<strong>${object.label}</strong>: <input type="${object.type}" value="${object.value}" id="poly-${object.htmlId}" style="width:100%;">`;
         break;
+        // text area
       case 'textarea':
         paragraph.innerHTML = `<label for="${object.htmlId}">${object.label}</label>:<br/><textarea id="poly-${object.htmlId}" name="${object.htmlId}" rows="3" wrap="hard" style="width:100%;">Freitextfeld</textarea>`;
         break;
+        // dropdown selection
       case 'dropdown':
         paragraph.innerHTML = `<strong>${object.label}</strong>: <br/><select id="poly-${object.htmlId}">
         <option value="">--Select an option--</option>
         ${object.value.split(',').map(item => { return `<option value="${item.trim()}">${item.trim()}</option>`}).join('\n')}
         </select>`;
         break;
+        // checkbox selection
       case 'checkbox':
         paragraph.innerHTML = `<fieldset>
     <legend>${object.label}</legend>
@@ -28,6 +32,7 @@ function mapIt() {
     </div>`}).join('\n')}
 </fieldset>`;
         break;
+        // date selection
       case 'date':
         const min = (object.min) ? `min="${object.min}"` : '';
         const max = (object.max) ? `max="${object.max}"` : '';
@@ -44,12 +49,13 @@ function mapIt() {
     fieldset.appendChild(paragraph);
   });
 
+  // Adds ‘Add polygon’ button as last child of metadata input form fields
   const fieldset = document.getElementById("poly-data-button");
   const paragraph = document.createElement('p');
   paragraph.innerHTML = `<button id="poly-add" style="" class="btn btn-lg btn-primary">Add Polygon</button>`;
   fieldset.appendChild(paragraph);
 
-  // Init map
+  // Initializes the Leaflet.js map
   const map = L.map('mapid', {
     crs: L.CRS.Simple,
     minZoom: -3,
@@ -61,7 +67,8 @@ function mapIt() {
     });
 
   const prepareDownload = function(data, filename) {
-    const text = JSON.stringify(data);
+    const text = JSON.stringify(data)
+      .replace(/\[null\]/g, '[[0,0]]');
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
@@ -76,7 +83,6 @@ function mapIt() {
       [],
       []
     ],
-    polygonString: "",
     polygonExport: []
   };
 
@@ -120,8 +126,6 @@ function mapIt() {
       });
 
       console.log(GEOJSON.properties);
-
-
       KONST.polygonExport.push(GEOJSON);
       console.log(KONST.polygonExport);
     });
@@ -140,8 +144,8 @@ function mapIt() {
 
   let image = "";
 
-  const AddImage = document.getElementById('poly-addimage')
-    .addEventListener("click", (e) => {
+  const AddImage = document.getElementById('poly-file')
+    .addEventListener("change", (e) => {
       let bounds = [
         [0, 0],
         [100, 100]
@@ -186,9 +190,6 @@ function mapIt() {
     const outline = [];
     const holes = [];
     console.log(e.originalEvent);
-
-
-
 
     if (e.originalEvent.shiftKey) {
       KONST.polygonArray[1].push(Array(lat, lng));
