@@ -49,12 +49,6 @@ function mapIt() {
     fieldset.appendChild(paragraph);
   });
 
-  // Adds ‘Add polygon’ button as last child of metadata input form fields
-  const fieldset = document.getElementById("poly-data-button");
-  const paragraph = document.createElement('p');
-  paragraph.innerHTML = `<button id="poly-add" style="" class="btn btn-lg btn-primary">Add Polygon</button>`;
-  fieldset.appendChild(paragraph);
-
   // Initializes the Leaflet.js map
   const map = L.map('mapid', {
     crs: L.CRS.Simple,
@@ -98,8 +92,17 @@ function mapIt() {
       .style.cursor = "crosshair";
   });
 
+  let FEATURES;
+
   const ADDbutton = document.getElementById('poly-add')
     .addEventListener("click", (e) => {
+
+
+      if (polygon._latlngs[1].length == 0) {
+        KONST.polygonArray[1].push(Array(0, 0));
+        polygon.setLatLngs(KONST.polygonArray);
+      }
+
       const GEOJSON = polygon.toGeoJSON();
 
       POLY_METADATA.forEach(object => {
@@ -128,6 +131,8 @@ function mapIt() {
       console.log(GEOJSON.properties);
       KONST.polygonExport.push(GEOJSON);
       console.log(KONST.polygonExport);
+
+
     });
 
   const CLEARbutton = document.getElementById('poly-clear')
@@ -200,6 +205,25 @@ function mapIt() {
     }
   });
 
+
+
+
+
+  document.getElementById('poly-show')
+    .addEventListener("click", (e) => {
+      FEATURES = L.geoJSON(KONST.polygonExport, {
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup(`<div style="width="250px;"><p>Inhalt der GEOJSON Properties: </p><pre><code>${JSON.stringify(feature.properties)}</code></pre></div>`);
+        }
+      });
+      FEATURES.addTo(map);
+      console.log('SHOW');
+    });
+
+  document.getElementById('poly-hide')
+    .addEventListener("click", (e) => {
+      FEATURES.removeFrom(map);
+    });
 }
 
 function setScript() {
