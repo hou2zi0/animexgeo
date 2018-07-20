@@ -6,6 +6,7 @@
   - [Usage](#usage)
     - [Configuration array](#configuration-array)
     - [HTML Scaffold](#html-scaffold)
+    - [GeoJSON Export](#geojson-export)
 - [To Do](#to-do)
 - [License](#license)
 
@@ -39,6 +40,8 @@ Then:
 * Click ‘Export JSON’ to retrieve the array of GeoJSON objects.
 
 A live example may be found [here](https://hou2zi0.github.io/animexgeo/HTML/animexgeo.html).
+
+![Annotate images in Leaflet.js with customized form fields](data/img/image_annotation.png)
 
 ### Configuration array
 
@@ -230,6 +233,68 @@ All the fieldsets, buttons, and their corresponding IDs are required for the scr
 
 </html>
 ```
+### GeoJSON Export
+
+A sample GeoJSON export is shown below.
+
+```javascript
+[{
+    "type": "Feature",
+    "properties": {
+        "namestring": "M2",
+        "cataloguenumbers": ["213"],
+        "commentary": "Meisterzeichen des Meisters \u2026",
+        "selection": "Value 2",
+        "checked": [
+            "Value 1",
+            "Value 3"
+        ],
+        "post quem": "1500-01-01"
+    },
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [
+                    674.734888,
+                    2356.000046
+                ],
+                [
+                    1026.527193,
+                    2356.000046
+                ],
+                [
+                    1018.531913,
+                    2016.000072
+                ],
+                [
+                    1018.531913,
+                    2016.000072
+                ],
+                [
+                    681.465391,
+                    2016.000036
+                ],
+                [
+                    674.734888,
+                    2356.000046
+                ]
+            ],
+            [
+                [
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0
+                ]
+            ]
+        ]
+    }
+}]
+```
+
 
 # To Do
 
