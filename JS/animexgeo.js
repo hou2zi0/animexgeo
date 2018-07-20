@@ -1,7 +1,6 @@
 function mapIt() {
 
   // Init form fields
-
   POLY_METADATA.forEach(object => {
     const fieldset = document.getElementById("poly-data");
     const paragraph = document.createElement('p');
@@ -31,30 +30,22 @@ function mapIt() {
         break;
     }
     fieldset.appendChild(paragraph);
-  }); //<textarea id="advanced" name="advanced" rows="3" cols="33" maxlength="200" wrap="hard">
+  });
 
   const fieldset = document.getElementById("poly-data-button");
   const paragraph = document.createElement('p');
   paragraph.innerHTML = `<button id="poly-add" style="" class="btn btn-lg btn-primary">Add Polygon</button>`;
   fieldset.appendChild(paragraph);
-  //<button id="poly-add">Add Polygon</button>
 
   // Init map
-
   const map = L.map('mapid', {
     crs: L.CRS.Simple,
     minZoom: -3,
   });
 
-
-
-
-  // STUFF
-
   const GEObutton = document.getElementById('poly-export')
     .addEventListener("click", (e) => {
       prepareDownload(KONST.polygonExport, 'polygonExport.json');
-
     });
 
   const prepareDownload = function(data, filename) {
@@ -75,7 +66,7 @@ function mapIt() {
     ],
     polygonString: "",
     polygonExport: []
-  }
+  };
 
   const polygon = L.polygon([
       [0, 0]
@@ -145,7 +136,6 @@ function mapIt() {
       ];
       const URL = document.getElementById('poly-file')
         .files[0];
-      //.value;
       var reader = new FileReader();
 
       reader.addEventListener("load", function() {
@@ -158,10 +148,6 @@ function mapIt() {
       if (URL) {
         reader.readAsDataURL(URL);
       }
-
-
-
-
       map.fitBounds(bounds);
       map.setZoom(-2);
     });
@@ -194,13 +180,9 @@ function mapIt() {
 
     if (e.originalEvent.shiftKey) {
       KONST.polygonArray[1].push(Array(lat, lng));
-      //console.log(KONST.polygonArray);
-      //console.log('_____');
       polygon.setLatLngs(KONST.polygonArray);
     } else {
       KONST.polygonArray[0].push(Array(lat, lng));
-      //console.log(KONST.polygonArray);
-      //console.log('_____');
       polygon.setLatLngs(KONST.polygonArray);
     }
   });
@@ -218,7 +200,7 @@ function setScript() {
   script.setAttribute('crossorigin', '');
 
 
-  document.head.appendChild(script); //or something of the likes
+  document.head.appendChild(script);
 }
 
 
@@ -227,14 +209,13 @@ link.setAttribute('rel', 'stylesheet');
 link.setAttribute('href', 'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css');
 link.setAttribute('integrity', 'sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==')
 link.setAttribute('crossorigin', '');
-document.head.appendChild(link); //or something of the likes
+document.head.appendChild(link);
 link.onload = function() {
 
   const style = document.createElement('style');
   style.innerText = "#mapid{ height: 800px; }"
 
-  document.head.appendChild(style); //or something of the likes
-  //do stuff with the script
+  document.head.appendChild(style);
   setScript();
   //
 };
