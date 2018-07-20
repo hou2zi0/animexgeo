@@ -19,7 +19,7 @@ function mapIt() {
 
   const fieldset = document.getElementById("poly-data-button");
   const paragraph = document.createElement('p');
-  paragraph.innerHTML = `<button id="poly-add" style="font-size: 24px; height: 150px;" class="btn btn-lg btn-primary">Add Polygon</button>`;
+  paragraph.innerHTML = `<button id="poly-add" style="" class="btn btn-lg btn-primary">Add Polygon</button>`;
   fieldset.appendChild(paragraph);
   //<button id="poly-add">Add Polygon</button>
 

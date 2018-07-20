@@ -25,30 +25,35 @@
 
     <div class="row">
 
-      <div class="col-lg-6">
+
+      <div class="col-lg-9">
+        <div id="mapid"></div>
+      </div>
 
 
+
+      <div class="col-lg-3">
         <fieldset id="poly-data">
           <legend>
             Add Polygon-Properties
           </legend>
         </fieldset>
-      </div>
 
-      <div class="col-lg-2">
+
+
         <div style="margin-top: 2em;" id="poly-data-button">
         </div>
-      </div>
 
 
 
-      <div class="col-lg-4">
+        <hr />
+
         <fieldset>
           <legend>
             Clear &amp; Export
           </legend>
-          <button id="poly-clear" class="btn btn-primary">Clear active polygon</button>
-          <button id="poly-export" class="btn btn-primary">Export all added polygons</button>
+          <button id="poly-clear" class="btn btn-primary">Clear Active</button>
+          <button id="poly-export" class="btn btn-primary">Export JSON</button>
         </fieldset>
 
 
@@ -62,10 +67,11 @@
           <button id="poly-overlay" class="btn btn-primary">Set overlay</button>
         </fieldset>
 
-
       </div>
+
     </div>
-    <div id="mapid"></div>
+
+
   </div>
   <script>
     const POLY_METADATA = [{
@@ -100,7 +106,7 @@
     ]
   </script>
 
-  <script src="path/to/animexgeo.js">
+  <script src="DIO_annotate_images.js">
   </script>
 
 </body>
