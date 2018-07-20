@@ -61,10 +61,10 @@ function mapIt() {
     });
 
   const prepareDownload = function(data, filename) {
-    const text = JSON.stringify(data)
+    const content = JSON.stringify(data)
       .replace(/\[null\]/g, '[[0,0]]');
     const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
     element.setAttribute('download', filename);
     element.style.display = 'none';
     document.body.appendChild(element);
@@ -96,8 +96,6 @@ function mapIt() {
 
   const ADDbutton = document.getElementById('poly-add')
     .addEventListener("click", (e) => {
-
-
       if (polygon._latlngs[1].length == 0) {
         KONST.polygonArray[1].push(Array(0, 0));
         polygon.setLatLngs(KONST.polygonArray);
@@ -117,7 +115,7 @@ function mapIt() {
             .map(n => {
               return n.getAttribute('value');
             });
-          value = valueArray.join(', ');
+          value = valueArray;
         } else {
           value = (object['separator']) ? document.getElementById(`poly-${object.htmlId}`)
             .value
@@ -127,12 +125,9 @@ function mapIt() {
         console.log(value);
         GEOJSON.properties[object.propertyId] = value;
       });
-
       console.log(GEOJSON.properties);
       KONST.polygonExport.push(GEOJSON);
       console.log(KONST.polygonExport);
-
-
     });
 
   const CLEARbutton = document.getElementById('poly-clear')
@@ -157,7 +152,7 @@ function mapIt() {
       ];
       const URL = document.getElementById('poly-file')
         .files[0];
-      var reader = new FileReader();
+      const reader = new FileReader();
 
       reader.addEventListener("load", function() {
         image = L.imageOverlay(reader.result, bounds, {
@@ -213,11 +208,10 @@ function mapIt() {
     .addEventListener("click", (e) => {
       FEATURES = L.geoJSON(KONST.polygonExport, {
         onEachFeature: (feature, layer) => {
-          layer.bindPopup(`<div style="width="250px;"><p>Inhalt der GEOJSON Properties: </p><pre><code>${JSON.stringify(feature.properties)}</code></pre></div>`);
+          layer.bindPopup(`<div style="width="250px;"><p>Content of GEOJSON Properties: </p><pre><code>${JSON.stringify(feature.properties)}</code></pre></div>`);
         }
       });
       FEATURES.addTo(map);
-      console.log('SHOW');
     });
 
   document.getElementById('poly-hide')

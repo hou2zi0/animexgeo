@@ -2,9 +2,7 @@
 
 <head>
   <title>A Leaflet map!</title>
-
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
-
   <style>
     fieldset {
       margin-top: 5px;
@@ -15,51 +13,33 @@
       margin-bottom: 15px;
     }
   </style>
-
-
 </head>
 
 <body>
   <div class="container">
-
-
     <div class="row">
-
-
       <div class="col-lg-9">
         <div id="mapid"></div>
       </div>
-
-
-
       <div class="col-lg-3">
         <fieldset id="poly-data">
           <legend>
             Add Polygon-Properties
           </legend>
         </fieldset>
-
-
         <hr />
         <div class="row" id="poly-data-button">
           <div class="col-lg-6">
-            <button id="poly-add" style="" class="btn btn-lg btn-primary">Add Polygon</button>
+            <button id="poly-add" class="btn btn-lg btn-primary">Add Polygon</button>
           </div>
-
           <div class="col-lg-3">
-            <button id="poly-show" style="" class="btn  btn-primary">Show</button>
+            <button id="poly-show" class="btn  btn-primary">Show</button>
           </div>
-
           <div class="col-lg-3">
-            <button id="poly-hide" style="" class="btn  btn-primary">Hide</button>
+            <button id="poly-hide" class="btn  btn-primary">Hide</button>
           </div>
-
         </div>
-
-
-
         <hr />
-
         <fieldset>
           <legend>
             Clear &amp; Export
@@ -67,8 +47,6 @@
           <button id="poly-clear" class="btn btn-primary">Clear Active</button>
           <button id="poly-export" class="btn btn-primary">Export JSON</button>
         </fieldset>
-
-
         <fieldset>
           <legend>
             Import image
@@ -76,12 +54,8 @@
           <input type="file" id="poly-file" accept="image/png, image/jpeg" class="btn btn-primary" style="margin-bottom: 10px;" />
           <button id="poly-overlay" class="btn btn-primary">Set overlay</button>
         </fieldset>
-
       </div>
-
     </div>
-
-
   </div>
   <script>
     const POLY_METADATA = [{
@@ -89,29 +63,29 @@
         "value": "Name",
         "htmlId": "name",
         "propertyId": "namestring",
-        "label": "Name oder ID"
+        "label": "Name or ID"
       },
       {
         "type": "text",
-        "value": "Katalognummern",
+        "value": "Cataloguenumbers",
         "htmlId": "cats",
-        "propertyId": "cataloguenumber",
-        "label": "Katalognummern (kommasepariert)",
+        "propertyId": "cataloguenumbers",
+        "label": "Calatoguenumbers (comma separated)",
         "separator": ","
       },
       {
         "type": "textarea",
-        "value": "Kommentar",
+        "value": "Commentary",
         "htmlId": "comment",
         "propertyId": "commentary",
-        "label": "Kommentar"
+        "label": "Commentary"
       },
       {
         "type": "dropdown",
         "value": "Value 1, Value 2, Value 3",
         "htmlId": "select",
         "propertyId": "selection",
-        "label": "Selektion"
+        "label": "Selection"
       },
       {
         "type": "checkbox",
@@ -125,16 +99,14 @@
         "value": "1500-01-01",
         "htmlId": "date-begin",
         "propertyId": "post quem",
-        "label": "Datierung (Anfang)",
+        "label": "Dating (post quem)",
         "min": "0500-01-01", // optional
         "max": "1675-12-31" // optional
       }
     ]
   </script>
-
   <script src="https://hou2zi0.github.io/animexgeo/JS/animexgeo.js">
   </script>
-
 </body>
 
 </html>
