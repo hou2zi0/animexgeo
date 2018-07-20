@@ -20,6 +20,9 @@ The script allows you
 * to provide a configuration file, which will render as a series of form fields, which give you the opportunity to input various forms of metadata associated with the currently active polygon
 * export the polygons and their corresponding metadata as a geojson file (the metadata are saved as `geojson.properties`).
 
+A live example may be found [here](https://hou2zi0.github.io/animexgeo/HTML/animexgeo.html).
+
+
 ## Usage
 
 On a local machine:
@@ -64,29 +67,29 @@ const POLY_METADATA = [{
     "value": "Name",
     "htmlId": "name",
     "propertyId": "namestring",
-    "label": "Name oder ID"
+    "label": "Name or ID"
   },
   {
     "type": "text",
-    "value": "Katalognummern",
+    "value": "Cataloguenumbers",
     "htmlId": "cats",
-    "propertyId": "cataloguenumber",
-    "label": "Katalognummern (kommasepariert)",
+    "propertyId": "cataloguenumbers",
+    "label": "Calatoguenumbers (comma separated)",
     "separator": ","
   },
   {
     "type": "textarea",
-    "value": "Kommentar",
+    "value": "Commentary",
     "htmlId": "comment",
     "propertyId": "commentary",
-    "label": "Kommentar"
+    "label": "Commentary"
   },
   {
     "type": "dropdown",
     "value": "Value 1, Value 2, Value 3",
     "htmlId": "select",
     "propertyId": "selection",
-    "label": "Selektion"
+    "label": "Selection"
   },
   {
     "type": "checkbox",
@@ -100,7 +103,7 @@ const POLY_METADATA = [{
     "value": "1500-01-01",
     "htmlId": "date-begin",
     "propertyId": "post quem",
-    "label": "Datierung (Anfang)",
+    "label": "Dating (post quem)",
     "min": "0500-01-01", // optional
     "max": "1675-12-31" // optional
   }
