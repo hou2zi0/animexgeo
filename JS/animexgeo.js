@@ -28,6 +28,18 @@ function mapIt() {
     </div>`}).join('\n')}
 </fieldset>`;
         break;
+      case 'date':
+        const min = (object.min) ? `min="${object.min}"` : '';
+        const max = (object.max) ? `max="${object.max}"` : '';
+        paragraph.innerHTML = ` <div>
+        <label for="${object.htmlId}">${object.label}</label>
+        <input type="date" id="poly-${object.htmlId}"
+               value="${object.value}"
+               ${min}
+               ${max}
+               />
+    </div>`;
+        break;
     }
     fieldset.appendChild(paragraph);
   });
