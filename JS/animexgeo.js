@@ -14,10 +14,20 @@ function mapIt() {
         paragraph.innerHTML = `<label for="${object.htmlId}">${object.label}</label>:<br/><textarea id="poly-${object.htmlId}" name="${object.htmlId}" rows="3" wrap="hard" style="width:100%;">Freitextfeld</textarea>`;
         break;
       case 'dropdown':
-        paragraph.innerHTML = `<strong>${object.label}</strong><select id="poly-${object.htmlId}">
+        paragraph.innerHTML = `<strong>${object.label}</strong>: <br/><select id="poly-${object.htmlId}">
         <option value="">--Select an option--</option>
         ${object.value.split(',').map(item => { return `<option value="${item.trim()}">${item.trim()}</option>`}).join('\n')}
         </select>`;
+        break;
+      case 'checkbox':
+        paragraph.innerHTML = `<fieldset>
+    <legend>${object.label}</legend>
+    ${object.value.split(',').map(item => { return `<div>
+        <input type="checkbox" class="poly-${object.htmlId}" id="${item.trim()}" name="${object.htmlId}"
+               value="${item.trim()}" />
+        <label for="${item.trim()}">${item.trim()}</label>
+    </div>`}).join('\n')}
+</fieldset>`;
         break;
     }
     fieldset.appendChild(paragraph);
@@ -84,26 +94,30 @@ function mapIt() {
       const GEOJSON = polygon.toGeoJSON();
 
       POLY_METADATA.forEach(object => {
-        const value = (object['separator']) ? document.getElementById(`poly-${object.htmlId}`)
-          .value
-          .split(object['separator']) : document.getElementById(`poly-${object.htmlId}`)
-          .value;
+        let value;
+        if (object.type == 'checkbox') {
+          const valueArray = Array.from(document.getElementsByClassName(`poly-${object.htmlId}`))
+            .filter(
+              n => {
+                return (n.checked);
+              }
+            )
+            .map(n => {
+              return n.getAttribute('value');
+            });
+          value = valueArray.join(', ');
+        } else {
+          value = (object['separator']) ? document.getElementById(`poly-${object.htmlId}`)
+            .value
+            .split(object['separator']) : document.getElementById(`poly-${object.htmlId}`)
+            .value;
+        }
         console.log(value);
         GEOJSON.properties[object.propertyId] = value;
       });
 
       console.log(GEOJSON.properties);
-      // const NAME = document.getElementById('poly-name')
-      //   .value;
-      // const CATS = document.getElementById('poly-cats')
-      //   .value.split(',');
-      // const STROKES = document.getElementById('poly-strokes')
-      //   .value;
-      // GEOJSON['properties'] = {
-      //   "name": NAME,
-      //   "cats": CATS,
-      //   "strokes": STROKES
-      // }
+
 
       KONST.polygonExport.push(GEOJSON);
       console.log(KONST.polygonExport);
@@ -147,12 +161,6 @@ function mapIt() {
 
 
 
-      // Old image loader with path input:
-      //console.log(URL);
-      // image = L.imageOverlay(URL, bounds, {
-      //   crossOrigin: true
-      // });
-      // image.addTo(map);
 
       map.fitBounds(bounds);
       map.setZoom(-2);
@@ -202,7 +210,6 @@ function mapIt() {
 function setScript() {
   const script = document.createElement('script');
   script.onload = function() {
-    //do stuff with the script
     mapIt();
     //
   };
@@ -224,7 +231,7 @@ document.head.appendChild(link); //or something of the likes
 link.onload = function() {
 
   const style = document.createElement('style');
-  style.innerText = "#mapid{ height: 700px; }"
+  style.innerText = "#mapid{ height: 800px; }"
 
   document.head.appendChild(style); //or something of the likes
   //do stuff with the script
