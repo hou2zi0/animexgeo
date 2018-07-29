@@ -49,27 +49,25 @@ function mapIt() {
 			break;
 			// checkbox selection
 		case 'checkbox':
-			paragraph.innerHTML = `<fieldset>
+			paragraph.innerHTML = `
      <strong>${object.label}</strong>: ${x_button}
      ${object.value.split(',').map(item => { return `<div>
          <input type="checkbox" class="poly-${object.htmlId}" id="${item.trim()}" name="${object.htmlId}"
                 value="${item.trim()}" />
          <label for="${item.trim()}">${item.trim()}</label>
-     </div>`}).join('\n')}
- </fieldset>`;
+     </div>`}).join('\n')}`;
 			break;
 			// date selection
 		case 'date':
 			const min = (object.min) ? `min="${object.min}"` : '';
 			const max = (object.max) ? `max="${object.max}"` : '';
-			paragraph.innerHTML = ` <div>
+			paragraph.innerHTML = `
          <label for="${object.htmlId}">${object.label}</label> ${x_button}:
          <input type="date" id="poly-${object.htmlId}"
                 value="${object.value}"
                 ${min}
                 ${max}
-                />
-     </div>`;
+                />`;
 			break;
 		}
 		POLY_METADATA.push(object);
