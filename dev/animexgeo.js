@@ -123,6 +123,12 @@ function mapIt() {
 					document.getElementById('span-sep')
 						.remove();
 				}
+
+				if (document.getElementById('sub-separator')) {
+					document.getElementById('sub-separator-label')
+						.remove();
+				}
+
 			}
 		});
 
