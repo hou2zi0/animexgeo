@@ -1,17 +1,21 @@
 # animexgeo
 
-<!-- TOC START min:1 max:3 link:true update:true -->
+
+<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:0 orderedList:0 -->
+
 - [animexgeo](#animexgeo)
-  - [Annotate Images and export GeoJSON](#annotate-images-and-export-geojson)
-  - [Usage](#usage)
-    - [Configuration array](#configuration-array)
-    - [HTML Scaffold](#html-scaffold)
-    - [GeoJSON Export](#geojson-export)
+	- [Annotate Images and export GeoJSON](#annotate-images-and-export-geojson)
+	- [Usage](#usage)
+		- [Adding form fields](#adding-form-fields)
+			- [Text with separator char](#text-with-separator-char)
+			- [Checkbox](#checkbox)
+			- [Date picker](#date-picker)
+		- [HTML Scaffold](#html-scaffold)
+		- [GeoJSON Export](#geojson-export)
 - [To Do](#to-do)
 - [License](#license)
 
-<!-- TOC END -->
-
+<!-- /TOC -->
 
 ## Annotate Images and export GeoJSON
 The script allows you
