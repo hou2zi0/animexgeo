@@ -12,11 +12,43 @@
       margin-top: 15px;
       margin-bottom: 15px;
     }
+
+    .hide {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
+    <div class="navigation">
+      <fieldset>
+        <legend>Add form field <button class="btn btn-success btn-xs" id="sub-hide-show">-</button></legend>
+        <div id="sub-fieldset">
+          <p>
+            <strong>Type</strong>:
+            <select id="sub-type">
+          <option value="textarea">Textarea</option>
+          <option value="text">Text</option>
+          <option value="dropdown">Dropdown</option>
+          <option value="checkbox">Checkbox</option>
+          <option value="date">Datepicker</option>
+        </select>
+          </p>
+          <p id="sub-type-separator"></p>
+          <p>
+            <strong>Value(s)</strong>: <input type="text" value="Value" id="sub-value" style="width:80%;"><br />
+          </p>
+          <p>
+            <strong>Label</strong>: <input type="text" value="Label" id="sub-label" style="width:80%;"><br />
+          </p>
+          <p>
+            <button class="btn btn-default" id="sub-formField">Add form field</button>
+          </p>
+        </div>
+      </fieldset>
+    </div>
+    <hr />
     <div class="row">
       <div class="col-lg-9">
         <div id="mapid"></div>
@@ -58,52 +90,53 @@
     </div>
   </div>
   <script>
-    const POLY_METADATA = [{
-        "type": "text",
-        "value": "Name",
-        "htmlId": "name",
-        "propertyId": "namestring",
-        "label": "Name or ID"
-      },
-      {
-        "type": "text",
-        "value": "Cataloguenumbers",
-        "htmlId": "cats",
-        "propertyId": "cataloguenumbers",
-        "label": "Calatoguenumbers (comma separated)",
-        "separator": ","
-      },
-      {
-        "type": "textarea",
-        "value": "Commentary",
-        "htmlId": "comment",
-        "propertyId": "commentary",
-        "label": "Commentary"
-      },
-      {
-        "type": "dropdown",
-        "value": "Value 1, Value 2, Value 3",
-        "htmlId": "select",
-        "propertyId": "selection",
-        "label": "Selection"
-      },
-      {
-        "type": "checkbox",
-        "value": "Value 1, Value 2, Value 3",
-        "htmlId": "check",
-        "propertyId": "checked",
-        "label": "Checkbox"
-      },
-      {
-        "type": "date",
-        "value": "1500-01-01",
-        "htmlId": "date-begin",
-        "propertyId": "post quem",
-        "label": "Dating (post quem)",
-        "min": "0500-01-01", // optional
-        "max": "1675-12-31" // optional
-      }
-    ]
+    // const POLY_METADATA = [
+    //   {
+    //     "type": "text",
+    //     "value": "Name",
+    //     "htmlId": "name",
+    //     "propertyId": "namestring",
+    //     "label": "Name or ID"
+    //   },
+    //   {
+    //     "type": "text",
+    //     "value": "Cataloguenumbers",
+    //     "htmlId": "cats",
+    //     "propertyId": "cataloguenumbers",
+    //     "label": "Calatoguenumbers (comma separated)",
+    //     "separator": ","
+    //   },
+    //   {
+    //     "type": "textarea",
+    //     "value": "Commentary",
+    //     "htmlId": "comment",
+    //     "propertyId": "commentary",
+    //     "label": "Commentary"
+    //   },
+    //   {
+    //     "type": "dropdown",
+    //     "value": "Value 1, Value 2, Value 3",
+    //     "htmlId": "select",
+    //     "propertyId": "selection",
+    //     "label": "Selection"
+    //   },
+    //   {
+    //     "type": "checkbox",
+    //     "value": "Value 1, Value 2, Value 3",
+    //     "htmlId": "check",
+    //     "propertyId": "checked",
+    //     "label": "Checkbox"
+    //   },
+    //   {
+    //     "type": "date",
+    //     "value": "1500-01-01",
+    //     "htmlId": "date-begin",
+    //     "propertyId": "post quem",
+    //     "label": "Dating (post quem)",
+    //     "min": "0500-01-01", // optional
+    //     "max": "1675-12-31" // optional
+    //   }
+    // ]
   </script>
   <script src="https://hou2zi0.github.io/animexgeo/JS/animexgeo.js">
   </script>
