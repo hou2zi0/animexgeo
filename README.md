@@ -57,6 +57,19 @@ The add form field section provides a way to add the following form fields to th
   * the property `value(s)` expects a comma separated list providing the selectable items, e.g. `cat, dog, bunny`
 * date
 
+![Adding form fields](data/img/add_forms_001.png)
+
+#### Text with separator char
+
+![Adding form fields](data/img/add_forms_002.png)
+
+#### Checkbox
+
+![Adding form fields](data/img/add_forms_003.png)
+
+#### Date picker
+
+![Adding form fields](data/img/add_forms_004.png)
 
 <!--
 ### Configuration array
