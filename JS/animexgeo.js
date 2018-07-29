@@ -219,12 +219,12 @@ function mapIt() {
 						.split(object['separator']) : document.getElementById(`poly-${object.htmlId}`)
 						.value;
 				}
-				console.log(value);
+
 				GEOJSON.properties[object.propertyId] = value;
 			});
-			console.log(GEOJSON.properties);
+
 			KONST.polygonExport.push(GEOJSON);
-			console.log(KONST.polygonExport);
+
 		});
 
 	const CLEARbutton = document.getElementById('poly-clear')
@@ -270,7 +270,7 @@ function mapIt() {
 
 	const Overlay = document.getElementById('poly-overlay')
 		.addEventListener("click", (e) => {
-			console.log(`${image._image.naturalHeight}  ${image._image.naturalWidth}`);
+
 			bounds = [
 				[0, 0],
 				[image._image.naturalHeight, image._image.naturalWidth]
@@ -286,7 +286,7 @@ function mapIt() {
 		const coord = `${lat},${lng}`;
 		const outline = [];
 		const holes = [];
-		console.log(e.originalEvent);
+
 
 		if (e.originalEvent.shiftKey) {
 			KONST.polygonArray[1].push(Array(lat, lng));
