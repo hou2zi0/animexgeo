@@ -61,10 +61,13 @@ function mapIt() {
 		case 'date':
 			const min = (object.min) ? `min="${object.min}"` : '';
 			const max = (object.max) ? `max="${object.max}"` : '';
+			const dateFrags = object.value.split('.');
+			const date = `${(dateFrags[2])? dateFrags[2]:'2000'}-${(dateFrags[1])? dateFrags[1]:'01'}-${(dateFrags[0])? dateFrags[0]:'01'}`;
+
 			paragraph.innerHTML = `
          <label for="${object.htmlId}">${object.label}</label> ${x_button}:
          <input type="date" id="poly-${object.htmlId}"
-                value="${object.value}"
+                value="${date}"
                 ${min}
                 ${max}
                 />`;

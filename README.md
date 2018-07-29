@@ -18,7 +18,7 @@ The script allows you
 * to load images (jpg or png) into an [Leaflet.js](https://leafletjs.com/) canvas area via file dialog
 * to annotate areas with polygons (more options coming, see To Do below)
   * the polygon may contain one hole, which can be annotated by holding the shift key while clicking
-* to provide a configuration file, which will render as a series of form fields, which give you the opportunity to input various forms of metadata associated with the currently active polygon
+* to configure a series of form fields and add them to the interface. The forms give you the opportunity to input various forms of metadata associated with the currently active polygon
 * export the polygons and their corresponding metadata as a geojson file (the metadata are saved as `geojson.properties`).
 
 A live example may be found [here](https://hou2zi0.github.io/animexgeo/HTML/animexgeo.html).
@@ -32,7 +32,7 @@ On a local machine:
 Then:
 * Load a file via the file dialog and click ‘Set overlay’ to adjust the image size to the canvas.
 * Click on the loaded image to annotate the polygon.
-* Fill in the form fields to provide metadata.
+* Add the form fields to the web interface to input metadata.
 * Click ‘Add polygon’ to add the polygon and its metadata to the underlying array of GeoJSON objects.
 * Click ‘Clear Active’ to erase the currently active polygon from the canvas.
   * ‘Show’ shows all currently annotated polygons, ‘Hide’ hides all currently annotated polygons.
@@ -43,6 +43,22 @@ A live example may be found [here](https://hou2zi0.github.io/animexgeo/HTML/anim
 
 ![Annotate images in Leaflet.js with customized form fields](data/img/image_annotation.png)
 
+
+### Adding form fields
+
+The add form field section provides a way to add the following form fields to the interface:
+
+* text
+  * may take a property `separator` whose value, e.g. `,`, provides the separator on which the text will be exploded into an array
+* textarea
+* dropdown
+  * the property `value(s)` expects a comma separated list providing the selectable items, e.g. `cat, dog, bunny`
+* checkbox
+  * the property `value(s)` expects a comma separated list providing the selectable items, e.g. `cat, dog, bunny`
+* date
+
+
+<!--
 ### Configuration array
 
 The example configuration provided in the live example is based on the following list of JSON objects. The script currently works with the following types of input:
@@ -112,7 +128,7 @@ const POLY_METADATA = [{
   }
 ]
 ```
-
+-->
 ### HTML Scaffold
 
 The example uses [Bootstrap CSS](https://getbootstrap.com/docs/3.3/css/).
@@ -134,11 +150,43 @@ All the fieldsets, buttons, and their corresponding IDs are required for the scr
       margin-top: 15px;
       margin-bottom: 15px;
     }
+
+    .hide {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
+    <div class="navigation">
+      <fieldset>
+        <legend>Add form field <button class="btn btn-success btn-xs" id="sub-hide-show">-</button></legend>
+        <div id="sub-fieldset">
+          <p>
+            <strong>Type</strong>:
+            <select id="sub-type">
+          <option value="textarea">Textarea</option>
+          <option value="text">Text</option>
+          <option value="dropdown">Dropdown</option>
+          <option value="checkbox">Checkbox</option>
+          <option value="date">Datepicker</option>
+        </select>
+          </p>
+          <p id="sub-type-separator"></p>
+          <p>
+            <strong>Value(s)</strong>: <input type="text" value="Value" id="sub-value" style="width:80%;"><br />
+          </p>
+          <p>
+            <strong>Label</strong>: <input type="text" value="Label" id="sub-label" style="width:80%;"><br />
+          </p>
+          <p>
+            <button class="btn btn-default" id="sub-formField">Add form field</button>
+          </p>
+        </div>
+      </fieldset>
+    </div>
+    <hr />
     <div class="row">
       <div class="col-lg-9">
         <div id="mapid"></div>
@@ -179,54 +227,6 @@ All the fieldsets, buttons, and their corresponding IDs are required for the scr
       </div>
     </div>
   </div>
-  <script>
-    const POLY_METADATA = [{
-        "type": "text",
-        "value": "Name",
-        "htmlId": "name",
-        "propertyId": "namestring",
-        "label": "Name oder ID"
-      },
-      {
-        "type": "text",
-        "value": "Katalognummern",
-        "htmlId": "cats",
-        "propertyId": "cataloguenumber",
-        "label": "Katalognummern (kommasepariert)",
-        "separator": ","
-      },
-      {
-        "type": "textarea",
-        "value": "Kommentar",
-        "htmlId": "comment",
-        "propertyId": "commentary",
-        "label": "Kommentar"
-      },
-      {
-        "type": "dropdown",
-        "value": "Value 1, Value 2, Value 3",
-        "htmlId": "select",
-        "propertyId": "selection",
-        "label": "Selektion"
-      },
-      {
-        "type": "checkbox",
-        "value": "Value 1, Value 2, Value 3",
-        "htmlId": "check",
-        "propertyId": "checked",
-        "label": "Checkbox"
-      },
-      {
-        "type": "date",
-        "value": "1500-01-01",
-        "htmlId": "date-begin",
-        "propertyId": "post quem",
-        "label": "Datierung (Anfang)",
-        "min": "0500-01-01", // optional
-        "max": "1675-12-31" // optional
-      }
-    ]
-  </script>
   <script src="https://hou2zi0.github.io/animexgeo/JS/animexgeo.js">
   </script>
 </body>
