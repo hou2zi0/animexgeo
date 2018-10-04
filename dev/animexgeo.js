@@ -203,7 +203,7 @@ function mapIt() {
 	// Initializes the Leaflet.js map
 	const map = L.map('mapid', {
 		crs: L.CRS.Simple,
-		minZoom: -3,
+		minZoom: -5,
 	});
 
 	const GEObutton = document.getElementById('poly-export')
@@ -321,10 +321,20 @@ function mapIt() {
 				.files[0];
 			const reader = new FileReader();
 
+
 			reader.addEventListener("load", function () {
 				image = L.imageOverlay(reader.result, bounds, {
 					crossOrigin: true
 				});
+				image.addEventListener("load", (e) => {
+					console.log(`${image._image.naturalHeight}  ${image._image.naturalWidth}`);
+					bounds = [
+						[0, 0],
+						[image._image.naturalHeight, image._image.naturalWidth]
+					];
+					image.setBounds(bounds);
+					map.fitBounds(bounds);
+				})
 				image.addTo(map);
 			}, false);
 
@@ -332,22 +342,23 @@ function mapIt() {
 				reader.readAsDataURL(URL);
 			}
 			map.fitBounds(bounds);
-			map.setZoom(-2);
+			map.setZoom(-1);
+
 		});
 
 
 
 
-	const Overlay = document.getElementById('poly-overlay')
-		.addEventListener("click", (e) => {
-			console.log(`${image._image.naturalHeight}  ${image._image.naturalWidth}`);
-			bounds = [
-				[0, 0],
-				[image._image.naturalHeight, image._image.naturalWidth]
-			];
-			image.setBounds(bounds);
-			map.fitBounds(bounds);
-		});
+	// const Overlay = document.getElementById('poly-overlay')
+	// 	.addEventListener("click", (e) => {
+	// 		console.log(`${image._image.naturalHeight}  ${image._image.naturalWidth}`);
+	// 		bounds = [
+	// 			[0, 0],
+	// 			[image._image.naturalHeight, image._image.naturalWidth]
+	// 		];
+	// 		image.setBounds(bounds);
+	// 		map.fitBounds(bounds);
+	// 	});
 
 	const polygon = L.polygon([
 		[0, 0]
