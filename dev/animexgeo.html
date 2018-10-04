@@ -37,10 +37,10 @@
           </p>
           <p id="sub-type-separator"></p>
           <p>
-            <strong>Value(s)</strong>: <input type="text" value="Value" id="sub-value" style="width:80%;"><br />
+            <strong>Label</strong>: <input type="text" value="Label" id="sub-label" style="width:80%;"><br />
           </p>
           <p>
-            <strong>Label</strong>: <input type="text" value="Label" id="sub-label" style="width:80%;"><br />
+            <strong>Value(s)</strong>: <input type="text" value="Value" id="sub-value" style="width:80%;"><br />
           </p>
           <p>
             <button class="btn btn-default" id="sub-formField">Add form field</button>
@@ -56,21 +56,23 @@
       <div class="col-lg-3">
         <fieldset id="poly-data">
           <legend>
-            Add Polygon-Properties
+            Geometry-Properties
           </legend>
         </fieldset>
         <hr />
-        <div class="row" id="poly-data-button">
-          <div class="col-lg-6">
-            <button id="poly-add" class="btn btn-lg btn-primary">Add Polygon</button>
-          </div>
-          <div class="col-lg-3">
-            <button id="poly-show" class="btn  btn-primary">Show</button>
-          </div>
-          <div class="col-lg-3">
-            <button id="poly-hide" class="btn  btn-primary">Hide</button>
-          </div>
-        </div>
+        <fieldset>
+          <form id="poly-data-geometry">
+            <input type="radio" name="geometry" value="marker" id="marker" checked><label for="marker">Marker</label>
+            <input type="radio" name="geometry" value="polygon" id="polygon"><label for="polygon">Polygon</label>
+          </form>
+          <button id="poly-add" class="btn btn-primary">Add</button>
+        </fieldset>
+        <fieldset>
+          <form id="poly-show-hide">
+            <input type="radio" name="visibility" value="show" id="show"><label for="show">Show</label>
+            <input type="radio" name="visibility" value="hide" id="hide" checked><label for="hide">Hide</label>
+          </form>
+        </fieldset>
         <hr />
         <fieldset>
           <legend>
@@ -89,55 +91,6 @@
       </div>
     </div>
   </div>
-  <script>
-    // const POLY_METADATA = [
-    //   {
-    //     "type": "text",
-    //     "value": "Name",
-    //     "htmlId": "name",
-    //     "propertyId": "namestring",
-    //     "label": "Name or ID"
-    //   },
-    //   {
-    //     "type": "text",
-    //     "value": "Cataloguenumbers",
-    //     "htmlId": "cats",
-    //     "propertyId": "cataloguenumbers",
-    //     "label": "Calatoguenumbers (comma separated)",
-    //     "separator": ","
-    //   },
-    //   {
-    //     "type": "textarea",
-    //     "value": "Commentary",
-    //     "htmlId": "comment",
-    //     "propertyId": "commentary",
-    //     "label": "Commentary"
-    //   },
-    //   {
-    //     "type": "dropdown",
-    //     "value": "Value 1, Value 2, Value 3",
-    //     "htmlId": "select",
-    //     "propertyId": "selection",
-    //     "label": "Selection"
-    //   },
-    //   {
-    //     "type": "checkbox",
-    //     "value": "Value 1, Value 2, Value 3",
-    //     "htmlId": "check",
-    //     "propertyId": "checked",
-    //     "label": "Checkbox"
-    //   },
-    //   {
-    //     "type": "date",
-    //     "value": "1500-01-01",
-    //     "htmlId": "date-begin",
-    //     "propertyId": "post quem",
-    //     "label": "Dating (post quem)",
-    //     "min": "0500-01-01", // optional
-    //     "max": "1675-12-31" // optional
-    //   }
-    // ]
-  </script>
   <script src="animexgeo.js">
   </script>
 </body>

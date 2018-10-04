@@ -2,6 +2,7 @@ function mapIt() {
 
 	if (typeof POLY_METADATA === 'undefined') POLY_METADATA = [];
 
+	// Begin addFormField()
 	const addFormField = function () {
 
 		const fieldset = document.getElementById("poly-data");
@@ -88,10 +89,14 @@ function mapIt() {
 				});
 			})
 	};
+	// End addFormField()
+	let geometry = 'marker';
 
-
-
-
+	const SwitchGeometry = document.getElementById('poly-data-geometry')
+		.addEventListener("change", (e) => {
+			console.log(e.target.value);
+			geometry = e.target.value;
+		});
 
 	const SUBformFieldButton = document.getElementById('sub-formField')
 		.addEventListener("click", (e) => {
@@ -131,7 +136,53 @@ function mapIt() {
 					document.getElementById('sub-separator-label')
 						.remove();
 				}
+			}
+		});
 
+
+	const formatPopup = function (feature) {
+
+		const aggr = Object.keys(feature.properties)
+			.map((key) => {
+				const value = feature.properties[key];
+				if (Array.isArray(value)) {
+					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>:</p> <ul style="padding-left: 15px; margin-bottom: 0px;">${value.map((n) => {return `<li>${n}</li>`;}).join('')}</ul>`;
+				} else if (value.includes('\n')) {
+					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>:</p> ${value.split('\n').map((n) => {return `<p style="margin: 3px 0;">${n}</p>`;}).join('')}`;
+				} else {
+					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>: ${value}</p>`;
+				}
+			});
+		popupText = `<div style="width="250px;">
+			${aggr.join('')}
+		</div>`;
+
+		return popupText;
+	}
+
+
+	const SwitchShowHide = document.getElementById('poly-show-hide')
+		.addEventListener("change", (e) => {
+			if (e.target.value == 'show') {
+				FEATURES = L.geoJSON(KONST.polygonExport, {
+					onEachFeature: (feature, layer) => {
+						layer.bindPopup(formatPopup(feature));
+						layer.options.draggable = true;
+						layer.on("dragend", (e) => {
+							const Latlng = e.target.getLatLng();
+							const lat = Latlng.lat;
+							const lng = Latlng.lng;
+							KONST.polygonExport.forEach((o) => {
+								if (o.properties.uid == feature.properties.uid) {
+									o.geometry.coordinates = Array(lng, lat);
+								}
+							})
+						});
+					}
+				});
+				FEATURES.addTo(map);
+			} else {
+				FEATURES.removeFrom(map);
 			}
 		});
 
@@ -180,11 +231,6 @@ function mapIt() {
 		polygonExport: []
 	};
 
-	const polygon = L.polygon([
-			[0, 0]
-		])
-		.addTo(map);
-
 	var popup = L.popup();
 
 	map.on('mouseover', e => {
@@ -193,15 +239,23 @@ function mapIt() {
 	});
 
 	let FEATURES;
+	let GEOJSON;
 
 	const ADDbutton = document.getElementById('poly-add')
 		.addEventListener("click", (e) => {
-			if (polygon._latlngs[1].length == 0) {
+			if (geometry == 'polygon' && polygon._latlngs[1].length == 0) {
 				KONST.polygonArray[1].push(Array(0, 0));
 				polygon.setLatLngs(KONST.polygonArray);
 			}
 
-			const GEOJSON = polygon.toGeoJSON();
+			switch (geometry) {
+			case 'polygon':
+				GEOJSON = polygon.toGeoJSON();
+				break;
+			case 'marker':
+				GEOJSON = marker.toGeoJSON();
+				break;
+			}
 
 			POLY_METADATA.forEach(object => {
 				let value;
@@ -222,9 +276,11 @@ function mapIt() {
 						.split(object['separator']) : document.getElementById(`poly-${object.htmlId}`)
 						.value;
 				}
+
 				console.log(value);
 				GEOJSON.properties[object.propertyId] = value;
 			});
+			GEOJSON.properties['uid'] = `${Math.random().toString().slice(2)}`;
 			console.log(GEOJSON.properties);
 			KONST.polygonExport.push(GEOJSON);
 			console.log(KONST.polygonExport);
@@ -232,14 +288,25 @@ function mapIt() {
 
 	const CLEARbutton = document.getElementById('poly-clear')
 		.addEventListener("click", (e) => {
-			polygon.setLatLngs([
-				[0, 0],
-				[0, 0]
-			]);
-			KONST.polygonArray = [
-				[],
-				[]
-			];
+			switch (geometry) {
+			case 'polygon':
+				polygon.setLatLngs([
+					[0, 0],
+					[0, 0]
+				]);
+				polygon.removeFrom(map);
+				KONST.polygonArray = [
+					[],
+					[]
+				];
+				break;
+			case 'marker':
+				marker.setLatLng([0, 0]);
+				marker.removeFrom(map);
+				break;
+			}
+
+
 		});
 
 	let image = "";
@@ -278,10 +345,18 @@ function mapIt() {
 				[0, 0],
 				[image._image.naturalHeight, image._image.naturalWidth]
 			];
-
 			image.setBounds(bounds);
 			map.fitBounds(bounds);
 		});
+
+	const polygon = L.polygon([
+		[0, 0]
+	]);
+
+	const marker = L.marker(
+		[0, 0]
+	);
+
 
 	map.on('click', e => {
 		const lat = e.latlng.lat;
@@ -291,33 +366,24 @@ function mapIt() {
 		const holes = [];
 		console.log(e.originalEvent);
 
-		if (e.originalEvent.shiftKey) {
-			KONST.polygonArray[1].push(Array(lat, lng));
-			polygon.setLatLngs(KONST.polygonArray);
-		} else {
-			KONST.polygonArray[0].push(Array(lat, lng));
-			polygon.setLatLngs(KONST.polygonArray);
+		switch (geometry) {
+		case 'polygon':
+			polygon.addTo(map);
+			if (e.originalEvent.shiftKey) {
+				KONST.polygonArray[1].push(Array(lat, lng));
+				polygon.setLatLngs(KONST.polygonArray);
+			} else {
+				KONST.polygonArray[0].push(Array(lat, lng));
+				polygon.setLatLngs(KONST.polygonArray);
+			}
+			break;
+		case 'marker':
+			marker.addTo(map);
+			marker.setLatLng(Array(lat, lng));
+			break;
 		}
 	});
-
-
-
-
-
-	document.getElementById('poly-show')
-		.addEventListener("click", (e) => {
-			FEATURES = L.geoJSON(KONST.polygonExport, {
-				onEachFeature: (feature, layer) => {
-					layer.bindPopup(`<div style="width="250px;"><p>Content of GEOJSON Properties: </p><pre><code>${JSON.stringify(feature.properties)}</code></pre></div>`);
-				}
-			});
-			FEATURES.addTo(map);
-		});
-
-	document.getElementById('poly-hide')
-		.addEventListener("click", (e) => {
-			FEATURES.removeFrom(map);
-		});
+	// End Mapit()
 }
 
 function setScript() {
