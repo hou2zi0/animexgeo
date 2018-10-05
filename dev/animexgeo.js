@@ -37,10 +37,18 @@ function mapIt() {
 		case 'text':
 			paragraph.innerHTML = `<strong>${object.label}</strong> ${(object.separator) ? `(Sep is ${object.separator})` : `` }: ${x_button}<br /><input type="${object.type}" value="${object.value}" id="poly-${object.htmlId}" style="width:100%;">`;
 			break;
+			// Image url
+		case 'image':
+			paragraph.innerHTML = `<strong>${object.label}</strong>: ${x_button}<br /><input type="url" placeholder="https://example.com" id="poly-${object.htmlId}" style="width:100%;" pattern="http*://.*" required>`;
+			break;
 			// text area
 		case 'textarea':
 			paragraph.innerHTML = `<label for="${object.htmlId}">${object.label}</label>: ${x_button}<br/><textarea id="poly-${object.htmlId}" name="${object.htmlId}" rows="3" wrap="hard" style="width:100%;">Freitextfeld</textarea>`;
 			break;
+			// urls
+			// case 'urls':
+			// 	paragraph.innerHTML = `<label for="${object.htmlId}">${object.label}</label>: ${x_button}<br/><textarea id="poly-${object.htmlId}" name="${object.htmlId}" rows="3" wrap="hard" style="width:100%;">One url per line.</textarea>`;
+			// 	break;
 			// dropdown selection
 		case 'dropdown':
 			paragraph.innerHTML = `<strong>${object.label}</strong>: ${x_button}<br/><select id="poly-${object.htmlId}">
@@ -150,7 +158,7 @@ function mapIt() {
 				} else if (value.includes('\n')) {
 					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>:</p> ${value.split('\n').map((n) => {return `<p style="margin: 3px 0;">${n}</p>`;}).join('')}`;
 				} else {
-					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>: ${value}</p>`;
+					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>: ${(value.startsWith('http')) ? `<img src="${value}" width="95%x">` : value}</p>`;
 				}
 			});
 		popupText = `<div style="width="250px;">
