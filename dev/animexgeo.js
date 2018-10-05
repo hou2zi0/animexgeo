@@ -309,7 +309,7 @@ function mapIt() {
 
 		});
 
-	let image = "";
+	let image;
 
 	const AddImage = document.getElementById('poly-file')
 		.addEventListener("change", (e) => {
@@ -319,15 +319,18 @@ function mapIt() {
 			];
 			const URL = document.getElementById('poly-file')
 				.files[0];
+
 			const reader = new FileReader();
 
-
-			reader.addEventListener("load", function () {
+			reader.addEventListener("load", (e) => {
 				image = L.imageOverlay(reader.result, bounds, {
 					crossOrigin: true
 				});
+
+				bounds = bounds;
+
 				image.addEventListener("load", (e) => {
-					console.log(`${image._image.naturalHeight}  ${image._image.naturalWidth}`);
+					console.log(`The images natural bounds are:\n\tHeight:\t${image._image.naturalHeight} pixel\n\tWidth:\t${image._image.naturalWidth} pixel`);
 					bounds = [
 						[0, 0],
 						[image._image.naturalHeight, image._image.naturalWidth]
@@ -342,8 +345,6 @@ function mapIt() {
 				reader.readAsDataURL(URL);
 			}
 			map.fitBounds(bounds);
-			map.setZoom(-1);
-
 		});
 
 
