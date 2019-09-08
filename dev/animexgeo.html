@@ -2,6 +2,8 @@
 
 <head>
   <title>Annotate images &amp; export GeoJSON</title>
+  <meta charset="UTF-8">
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
   <style>
     fieldset {
@@ -15,6 +17,72 @@
 
     .hide {
       display: none;
+    }
+
+    ol#annotations {
+      padding-left: 0px !important;
+    }
+
+    li.annotation {
+      list-style-type: none;
+      background: lightgrey;
+      margin-bottom: 0.5em;
+      padding: 0.5em 1em 0.5em 1em;
+    }
+
+    .focus {
+      border: 5px red solid;
+    }
+
+    /* Popup container */
+
+    .popup {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    /* The actual popup (appears on top) */
+
+    .popup .popuptext {
+      visibility: hidden;
+      width: 350px;
+      background-color: #555;
+      color: #fff;
+      padding: 5px 10px 5px 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      right: -450%;
+      margin-left: 0px;
+    }
+
+    /* Toggle this class when clicking on the popup container (hide and show the popup) */
+
+    .popup .show {
+      visibility: visible;
+      -webkit-animation: fadeIn 1s;
+      animation: fadeIn 1s
+    }
+
+    /* Add animation (fade in the popup) */
+
+    @-webkit-keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
     }
   </style>
 </head>
@@ -64,15 +132,15 @@
         <hr />
         <fieldset>
           <form id="poly-data-geometry">
-            <input type="radio" name="geometry" value="marker" id="marker" checked><label for="marker">Marker</label>
-            <input type="radio" name="geometry" value="polygon" id="polygon"><label for="polygon">Polygon</label>
+            <input type="radio" name="geometry" value="marker" id="marker" checked><label for="marker">&nbsp;📍 Marker</label><br>
+            <input type="radio" name="geometry" value="polygon" id="polygon"><label for="polygon">&nbsp;🛆 Polygon</label>
           </form>
-          <button id="poly-add" class="btn btn-primary">Add</button>
+          <button id="poly-add" class="btn btn-primary">Add current geometry</button>
         </fieldset>
         <fieldset>
           <form id="poly-show-hide">
-            <input type="radio" name="visibility" value="show" id="show"><label for="show">Show</label>
-            <input type="radio" name="visibility" value="hide" id="hide" checked><label for="hide">Hide</label>
+            <input type="radio" name="visibility" value="show" id="show"><label for="show">&nbsp;Show</label><br>
+            <input type="radio" name="visibility" value="hide" id="hide" checked><label for="hide">&nbsp;Hide</label>
           </form>
         </fieldset>
         <hr />
@@ -84,13 +152,21 @@
           <button id="poly-export" class="btn btn-primary">Export JSON</button>
         </fieldset>
         <fieldset>
-          <legend>
-            Import image
+          <legend id="import-image">
+            🗺️ Import image
           </legend>
           <input type="file" id="poly-file" accept="image/png, image/jpeg" class="btn btn-primary" style="margin-bottom: 10px;" />
           <!--  <button id="poly-overlay" class="btn btn-primary">Set overlay</button> -->
         </fieldset>
       </div>
+    </div>
+    <div id="annotation-info">
+      <h2>Annotations</h2>
+      <div id="image-info">
+      </div>
+      <ol id="annotations">
+        <li>none yet...</li>
+      </ol>
     </div>
   </div>
   <script src="animexgeo.js">

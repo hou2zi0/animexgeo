@@ -90,9 +90,11 @@ function mapIt() {
 			.forEach((n) => {
 				n.addEventListener("click", (e) => {
 					const UID = e.currentTarget.parentNode.getAttribute('data-ID');
+					// filter from list
 					POLY_METADATA = POLY_METADATA.filter((item) => {
 						return item.UID != UID;
 					});
+					// delete from DOM
 					e.currentTarget.parentNode.remove();
 				});
 			})
@@ -120,20 +122,35 @@ function mapIt() {
 				span.innerHTML = `<button class="btn btn-default btn-xs" id="sub-sep">Separator</button>`;
 				e.currentTarget.parentNode.appendChild(span);
 
-				const selectSeparator = document.getElementById('sub-sep')
-					.addEventListener("click", (e) => {
-						const subtype = document.getElementById('sub-type');
-						if ((subtype.value == 'text')) {
-							if (document.getElementById('sub-separator')) {
-								document.getElementById('sub-separator-label')
-									.remove();
-							} else {
-								document.getElementById('sub-type-separator')
-									.innerHTML = `<span id="sub-separator-label"><strong>Separator</strong>: <input type="text" value="," id="sub-separator"></span>`;
-							}
+				const selectSeparator = document.getElementById('sub-sep');
+				selectSeparator.addEventListener("click", (e) => {
+					const subtype = document.getElementById('sub-type');
+					if ((subtype.value == 'text')) {
+						if (document.getElementById('sub-separator')) {
+							document.getElementById('sub-separator-label')
+								.remove();
+						} else {
+							document.getElementById('sub-type-separator')
+								.innerHTML = `<span id="sub-separator-label"><strong>Separator</strong>: <input type="text" value="," id="sub-separator">
+								<span id="separator-help" class="popup">&nbsp;[❔]
+									<span class="popuptext" id="separator-help-popup">The string will be split on the given separator char.</span>
+								</span>
+								</span>`;
+							document.getElementById('separator-help')
+								.addEventListener("mouseover", (e) => {
+									console.log("X");
+									var popup = document.getElementById("separator-help-popup");
+									popup.classList.toggle("show");
+								});
+							document.getElementById('separator-help')
+								.addEventListener("mouseout", (e) => {
+									console.log("X");
+									var popup = document.getElementById("separator-help-popup");
+									popup.classList.toggle("show");
+								});
 						}
-					});
-
+					}
+				});
 			} else {
 				if (document.getElementById('span-sep')) {
 					document.getElementById('span-sep')
@@ -158,7 +175,7 @@ function mapIt() {
 				} else if (value.includes('\n')) {
 					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>:</p> ${value.split('\n').map((n) => {return `<p style="margin: 3px 0;">${n}</p>`;}).join('')}`;
 				} else {
-					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>: ${(value.startsWith('http')) ? `<img src="${value}" width="95%x">` : value}</p>`;
+					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>: ${(value.startsWith('http')) ? `<img src="${value}" width="100%x">` : value}</p>`;
 				}
 			});
 		popupText = `<div style="width="250px;">
@@ -168,6 +185,25 @@ function mapIt() {
 		return popupText;
 	}
 
+	const formatAnnotationListItem = function (feature) {
+
+		const aggr = Object.keys(feature.properties)
+			.map((key) => {
+				const value = feature.properties[key];
+				if (Array.isArray(value)) {
+					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>:</p> <ul style="padding-left: 15px; margin-bottom: 0px;">${value.map((n) => {return `<li>${n}</li>`;}).join('')}</ul>`;
+				} else if (value.includes('\n')) {
+					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>:</p> ${value.split('\n').map((n) => {return `<p style="margin: 3px 0;">${n}</p>`;}).join('')}`;
+				} else {
+					return `<p style="margin: 10px 0px 0px 0px;"><strong>${key}</strong>: ${(value.startsWith('http')) ? `<img src="${value}" width="100%x">` : value}</p>`;
+				}
+			});
+		annotationListItemHTML = `
+			${aggr.join('')}
+		<button type="button" data-uid="${feature.properties.uid}" class="btn btn-danger btn-xs removeAnnotationButton">X</button>`;
+
+		return annotationListItemHTML;
+	}
 
 	const SwitchShowHide = document.getElementById('poly-show-hide')
 		.addEventListener("change", (e) => {
@@ -176,6 +212,16 @@ function mapIt() {
 					onEachFeature: (feature, layer) => {
 						layer.bindPopup(formatPopup(feature));
 						layer.options.draggable = true;
+						layer.on("mouseover", (e) => {
+							const UID = feature.properties.uid;
+							document.getElementById(UID)
+								.classList.add('focus');
+						});
+						layer.on("mouseout", (e) => {
+							const UID = feature.properties.uid;
+							document.getElementById(UID)
+								.classList.remove('focus');
+						});
 						layer.on("dragend", (e) => {
 							const Latlng = e.target.getLatLng();
 							const lat = Latlng.lat;
@@ -220,7 +266,17 @@ function mapIt() {
 		});
 
 	const prepareDownload = function (data, filename) {
-		const content = JSON.stringify(data)
+		const imageInfo = document.getElementById("image-info");
+		const content = JSON.stringify({
+				"type": "FeatureCollection",
+				"description": {
+					"filename": imageInfo.dataset.filename,
+					"height": imageInfo.dataset.height,
+					"width": imageInfo.dataset.width,
+					"Date": imageInfo.dataset.date
+				},
+				"features": data
+			})
 			.replace(/\[null\]/g, '[[0,0]]');
 		const element = document.createElement('a');
 		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
@@ -248,6 +304,64 @@ function mapIt() {
 
 	let FEATURES;
 	let GEOJSON;
+
+	function clearCurrent() {
+		switch (geometry) {
+		case 'polygon':
+			polygon.setLatLngs([
+				[0, 0],
+				[0, 0]
+			]);
+			polygon.removeFrom(map);
+			KONST.polygonArray = [
+				[],
+				[]
+			];
+			break;
+		case 'marker':
+			marker.setLatLng([0, 0]);
+			marker.removeFrom(map);
+			break;
+		}
+	}
+
+	function addArrayToMap() {
+		if (FEATURES != undefined) {
+			FEATURES.removeFrom(map);
+		}
+
+		FEATURES = L.geoJSON(KONST.polygonExport, {
+			onEachFeature: (feature, layer) => {
+				layer.bindPopup(formatPopup(feature));
+				layer.options.draggable = true;
+				layer.on("mouseover", (e) => {
+					const UID = feature.properties.uid;
+					document.getElementById(UID)
+						.classList.add('focus');
+				});
+				layer.on("mouseout", (e) => {
+					const UID = feature.properties.uid;
+					document.getElementById(UID)
+						.classList.remove('focus');
+				});
+				layer.on("dragend", (e) => {
+					const Latlng = e.target.getLatLng();
+					const lat = Latlng.lat;
+					const lng = Latlng.lng;
+					KONST.polygonExport.forEach((o) => {
+						if (o.properties.uid == feature.properties.uid) {
+							o.geometry.coordinates = Array(lng, lat);
+						}
+					})
+				});
+			}
+		});
+		FEATURES.addTo(map);
+		document.getElementById('show')
+			.checked = true;
+
+		clearCurrent();
+	};
 
 	const ADDbutton = document.getElementById('poly-add')
 		.addEventListener("click", (e) => {
@@ -288,33 +402,76 @@ function mapIt() {
 				console.log(value);
 				GEOJSON.properties[object.propertyId] = value;
 			});
+
 			GEOJSON.properties['uid'] = `${Math.random().toString().slice(2)}`;
 			console.log(GEOJSON.properties);
 			KONST.polygonExport.push(GEOJSON);
 			console.log(KONST.polygonExport);
+
+			addArrayToMap();
+
+			const ListOfAnnotations = document.getElementById('annotations');
+			ListOfAnnotations.innerHTML = '';
+
+			KONST.polygonExport.forEach((item) => {
+				const node = document.createElement('LI');
+				node.classList.add('annotation');
+				node.id = item.properties.uid;
+				node.dataset.uid = item.properties.uid;
+				node.dataset.type = item.geometry.type;
+				const li = ListOfAnnotations.appendChild(node);
+				li.innerHTML = formatAnnotationListItem(item);
+
+				Array.from(li.getElementsByClassName('removeAnnotationButton'))
+					.forEach(
+						(n) => {
+							n.addEventListener('click', (e) => {
+								FEATURES.removeFrom(map);
+
+								const UID = e.currentTarget.getAttribute('data-uid');
+
+								KONST.polygonExport = KONST.polygonExport.filter((item) => {
+									return item.properties.uid != UID;
+								});
+
+								FEATURES = L.geoJSON(KONST.polygonExport, {
+									onEachFeature: (feature, layer) => {
+										layer.bindPopup(formatPopup(feature));
+										layer.options.draggable = true;
+										layer.on("mouseover", (e) => {
+											const UID = feature.properties.uid;
+											document.getElementById(UID)
+												.classList.add('focus');
+										});
+										layer.on("mouseout", (e) => {
+											const UID = feature.properties.uid;
+											document.getElementById(UID)
+												.classList.remove('focus');
+										});
+										layer.on("dragend", (e) => {
+											const Latlng = e.target.getLatLng();
+											const lat = Latlng.lat;
+											const lng = Latlng.lng;
+											KONST.polygonExport.forEach((o) => {
+												if (o.properties.uid == feature.properties.uid) {
+													o.geometry.coordinates = Array(lng, lat);
+												}
+											})
+										});
+									}
+								});
+								FEATURES.addTo(map);
+
+								e.currentTarget.parentNode.remove();
+							});
+						}
+					);
+			});
 		});
 
 	const CLEARbutton = document.getElementById('poly-clear')
 		.addEventListener("click", (e) => {
-			switch (geometry) {
-			case 'polygon':
-				polygon.setLatLngs([
-					[0, 0],
-					[0, 0]
-				]);
-				polygon.removeFrom(map);
-				KONST.polygonArray = [
-					[],
-					[]
-				];
-				break;
-			case 'marker':
-				marker.setLatLng([0, 0]);
-				marker.removeFrom(map);
-				break;
-			}
-
-
+			clearCurrent();
 		});
 
 	let image;
@@ -338,6 +495,7 @@ function mapIt() {
 				bounds = bounds;
 
 				image.addEventListener("load", (e) => {
+					console.log(URL);
 					console.log(`The images natural bounds are:\n\tHeight:\t${image._image.naturalHeight} pixel\n\tWidth:\t${image._image.naturalWidth} pixel`);
 					bounds = [
 						[0, 0],
@@ -345,6 +503,18 @@ function mapIt() {
 					];
 					image.setBounds(bounds);
 					map.fitBounds(bounds);
+					const date = new Date();
+					const imageInfo = document.getElementById("image-info");
+					imageInfo.innerHTML = `<div style="border-left: 5px solid lightgrey; padding-left:2em;">
+														<p><strong>Filename</strong>: ${URL.name}</p>
+														<p><strong>Height</strong>: ${image._image.naturalHeight} pixels</p>
+														<p><strong>Width</strong>: ${image._image.naturalWidth} pixels</p>
+														<p><strong>Date</strong>: ${date.toLocaleDateString("de-DE")}</p>
+													</div>`;
+					imageInfo.dataset.filename = URL.name;
+					imageInfo.dataset.height = image._image.naturalHeight;
+					imageInfo.dataset.width = image._image.naturalWidth;
+					imageInfo.dataset.date = date.toLocaleDateString("de-DE");
 				})
 				image.addTo(map);
 			}, false);
@@ -354,20 +524,6 @@ function mapIt() {
 			}
 			map.fitBounds(bounds);
 		});
-
-
-
-
-	// const Overlay = document.getElementById('poly-overlay')
-	// 	.addEventListener("click", (e) => {
-	// 		console.log(`${image._image.naturalHeight}  ${image._image.naturalWidth}`);
-	// 		bounds = [
-	// 			[0, 0],
-	// 			[image._image.naturalHeight, image._image.naturalWidth]
-	// 		];
-	// 		image.setBounds(bounds);
-	// 		map.fitBounds(bounds);
-	// 	});
 
 	const polygon = L.polygon([
 		[0, 0]
@@ -406,6 +562,7 @@ function mapIt() {
 	// End Mapit()
 }
 
+// Needs refactoring
 function setScript() {
 	const script = document.createElement('script');
 	script.onload = function () {
@@ -416,10 +573,8 @@ function setScript() {
 	script.integrity = "sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==";
 	script.setAttribute('crossorigin', '');
 
-
 	document.head.appendChild(script);
 }
-
 
 const link = document.createElement('link');
 link.setAttribute('rel', 'stylesheet');
@@ -435,4 +590,39 @@ link.onload = function () {
 	document.head.appendChild(style);
 	setScript();
 	//
+
+	// Set helptexts
+
+	function setHelpTexts(array) {
+		array.forEach(
+			(object) => {
+				const span = document.createElement("SPAN");
+				span.innerHTML = `
+				<span id="${object.name}-help" class="popup">&nbsp;[❔]
+					<span class="popuptext" id="${object.name}-help-popup">${object.helptext.split(/\r?\n/).join('<br>')}</span>
+				</span>`;
+				document.getElementById(`${object.name}`)
+					.appendChild(span);
+				document.getElementById(`${object.name}-help`)
+					.addEventListener("mouseover", (e) => {
+						console.log("X");
+						var popup = document.getElementById(`${object.name}-help-popup`);
+						popup.classList.toggle("show");
+					});
+				document.getElementById(`${object.name}-help`)
+					.addEventListener("mouseout", (e) => {
+						console.log("X");
+						var popup = document.getElementById(`${object.name}-help-popup`);
+						popup.classList.toggle("show");
+					});
+			}
+		)
+	}
+
+	setHelpTexts([{
+		"name": "import-image",
+		"helptext": `You may upload a JPG- or PNG-file through a file dialogue.
+								 The image will appear in the greay area on the left.`
+	}]);
+
 };
