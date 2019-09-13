@@ -168,8 +168,9 @@ function mapIt() {
   function geometryToString(feature) {
     switch (feature.geometry.type) {
       case 'Polygon':
-        const concat = feature.geometry.coordinates.map((tuple) =>
-            return `(${tuple.join(', ')})`;)
+        const concat = feature.geometry.coordinates[0].map((tuple) => {
+            return `(${tuple.join(', ')})`;
+          })
           .join(', ');
         return concat;
         break;
@@ -213,7 +214,7 @@ function mapIt() {
         }
       });
     annotationListItemHTML = `
-    <p>Type <em>${feature.geometry.type}</em> at ${ geometryToString(feature) }.</p>
+    <p>Type <em>${feature.geometry.type}</em> at <em>Coordinates</em> ${ geometryToString(feature) }.</p>
 			${aggr.join('')}
 		<button type="button" data-uid="${feature.properties.uid}" class="btn btn-danger btn-xs removeAnnotationButton">X</button>`;
 

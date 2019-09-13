@@ -135,7 +135,7 @@
             <input type="radio" name="geometry" value="marker" id="marker" checked><label for="marker">&nbsp;📍 Marker</label><br>
             <input type="radio" name="geometry" value="polygon" id="polygon"><label for="polygon">&nbsp;🛆 Polygon</label>
           </form>
-          <button id="poly-add" class="btn btn-primary">Add current geometry</button>
+          <button id="poly-add" class="btn btn-primary">➕ Add current geometry</button>
         </fieldset>
         <fieldset>
           <form id="poly-show-hide">
@@ -148,14 +148,21 @@
           <legend>
             Clear &amp; Export
           </legend>
-          <button id="poly-clear" class="btn btn-primary">Clear Active</button>
-          <button id="poly-export" class="btn btn-primary">Export JSON</button>
+          <button id="poly-clear" class="btn btn-primary">🗑️ Clear Active</button>
+          <button id="poly-export" class="btn btn-primary">📦 Export JSON</button>
         </fieldset>
         <fieldset>
           <legend id="import-image">
             🗺️ Import image
           </legend>
           <input type="file" id="poly-file" accept="image/png, image/jpeg" class="btn btn-primary" style="margin-bottom: 10px;" />
+          <!--  <button id="poly-overlay" class="btn btn-primary">Set overlay</button> -->
+        </fieldset>
+        <fieldset>
+          <legend id="import-image">
+            📂 Import GeoJSON
+          </legend>
+          <input type="file" id="poly-file-geojson" accept="text/json" class="btn btn-primary" style="margin-bottom: 10px;" />
           <!--  <button id="poly-overlay" class="btn btn-primary">Set overlay</button> -->
         </fieldset>
       </div>
