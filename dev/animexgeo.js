@@ -374,6 +374,17 @@ function mapIt() {
             }
           })
         });
+        layer.on("contextmenu", (e) => {
+          console.log();
+          const UID = feature.properties.uid;
+          KONST.polygonExport = KONST.polygonExport.filter((item) => {
+            return item.properties.uid != UID;
+          });
+          console.log(UID);
+          e.target.remove();
+          document.getElementById(UID)
+            .remove();
+        });
       }
     });
     FEATURES.addTo(map);
