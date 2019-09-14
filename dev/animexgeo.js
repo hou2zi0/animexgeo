@@ -227,6 +227,7 @@ function mapIt() {
   const SwitchShowHide = document.getElementById('poly-show-hide')
     .addEventListener("change", (e) => {
       if (e.target.value == 'show') {
+        // refactor out into function
         FEATURES = L.geoJSON(KONST.polygonExport, {
           onEachFeature: (feature, layer) => {
             layer.bindPopup(formatPopup(feature));
@@ -281,7 +282,7 @@ function mapIt() {
 
   const GEObutton = document.getElementById('poly-export')
     .addEventListener("click", (e) => {
-      prepareDownload(KONST.polygonExport, 'polygonExport.json');
+      prepareDownload(KONST.polygonExport, `${imageInfo.dataset.filename.replace(/\s/, '_')}.geo.json`);
     });
 
   const prepareDownload = function(data, filename) {
@@ -292,7 +293,9 @@ function mapIt() {
           "filename": imageInfo.dataset.filename,
           "height": imageInfo.dataset.height,
           "width": imageInfo.dataset.width,
-          "Date": imageInfo.dataset.date
+          "annotator": document.getElementById('annotator-name')
+            .value,
+          "date": imageInfo.dataset.date
         },
         "features": data
       })
@@ -317,9 +320,72 @@ function mapIt() {
 
   var popup = L.popup();
 
-  map.on('mouseover', e => {
+  /* tooltip
+    L.polygon([
+        [56.3776, 98.563463],
+        [101.904443, 97.563453],
+        [101.654296, 52.563013],
+        [60.129812, 54.31303],
+        [56.3776, 98.563463]
+      ])
+      .addTo(map)
+      .bindTooltip('tooltip on the left', {
+        sticky: true
+      });
+  */
+
+  const guideLines = [];
+
+  map.on('mousemove', (e) => {
+
+    if (geometry == 'polygon') {
+
+      if (guideLines.length != 0) {
+        guideLines.forEach((line) => {
+          console.log(line);
+          line.remove();
+        })
+      }
+
+      guidelines = [];
+
+      if (KONST.polygonArray[0].length >= 2) {
+        const first = KONST.polygonArray[0][0];
+        const last = KONST.polygonArray[0][KONST.polygonArray[0].length - 1];
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        const line_1 = Array(
+          Array(lat, lng), first
+        );
+        const line_2 = Array(last, Array(lat, lng));
+        console.log(line_1);
+        console.log(line_2);
+        const firstLine = L.polyline(line_1, {
+            "dashArray": "1 10",
+            "weight": 5
+          })
+          .addTo(map);
+        const lastLine = L.polyline(line_2, {
+            "dashArray": "1 10",
+            "weight": 5
+          })
+          .addTo(map);
+        guideLines.push(firstLine);
+        guideLines.push(lastLine);
+      }
+    }
+
+  });
+
+  map.on('mouseover', (e) => {
+    console.log(e);
     document.getElementById("mapid")
       .style.cursor = "crosshair";
+  });
+
+  map.on('keydown', (e) => {
+    console.log(`Code: ${e.originalEvent.code}, Key: |${e.originalEvent.key}|`);
+
   });
 
   let FEATURES;
@@ -396,6 +462,7 @@ function mapIt() {
 
   const ADDbutton = document.getElementById('poly-add')
     .addEventListener("click", (e) => {
+      // bundle in function
       if (geometry == 'polygon' && polygon._latlngs[1].length == 0) {
         KONST.polygonArray[1].push(Array(0, 0));
         polygon.setLatLngs(KONST.polygonArray);
@@ -466,7 +533,7 @@ function mapIt() {
                 KONST.polygonExport = KONST.polygonExport.filter((item) => {
                   return item.properties.uid != UID;
                 });
-
+                // refactor out these build up function
                 FEATURES = L.geoJSON(KONST.polygonExport, {
                   onEachFeature: (feature, layer) => {
                     layer.bindPopup(formatPopup(feature));
@@ -673,6 +740,7 @@ function mapIt() {
     [0, 0]
   );
 
+  const circleMarkers = [];
 
   map.on('click', e => {
     const lat = e.latlng.lat;
@@ -692,6 +760,15 @@ function mapIt() {
           KONST.polygonArray[0].push(Array(lat, lng));
           polygon.setLatLngs(KONST.polygonArray);
         }
+        // add erasing of circle markers; add feature ids to circleMarkers
+        KONST.polygonArray[0].forEach((coord) => {
+          const circle = L.circleMarker(coord, {
+            "radius": 5,
+            "fillOpacity": 1,
+          });
+          circleMarkers.push(circle);
+          circle.addTo(map);
+        })
         break;
       case 'marker':
         marker.addTo(map);
@@ -709,8 +786,9 @@ function setScript() {
     mapIt();
     //
   };
-  script.src = "https://unpkg.com/leaflet@1.3.1/dist/leaflet.js";
-  script.integrity = "sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==";
+  //1.3.1
+  script.src = "https://unpkg.com/leaflet@1.5.0/dist/leaflet.js";
+  //script.integrity = "sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==";
   script.setAttribute('crossorigin', '');
 
   document.head.appendChild(script);
