@@ -528,18 +528,59 @@ function mapIt() {
 
     const html = keyValuePairs.keys
       .map((key) => {
-        return `<input type="checkbox" class="poly-highlight" id="poly-highlight-${key}" name="${key}" value="${key}" />
-      <label for="${key}">${key}</label>
-      <select id="poly-highlight-${key}-dropdown" data-key="${key}">
-       <option value="">--Select an option--</option>
-       ${keyValuePairs.pairs[`${key}`].map(item => { return `<option value="${item}">${item}</option>`}).join('\n')}
+        return `<li>
+        <input type="checkbox" class="poly-highlight-checkbox" id="poly-highlight-${key}-checkbox" name="${key}" value="${key}" />
+        <label for="${key}">${key}</label>
+        <select id="poly-highlight-${key}-dropdown" data-key="${key}" class="poly-highlight-dropdown">
+        <option value="">--Select an option--</option>
+        ${keyValuePairs.pairs[`${key}`].map(item => { return `<option value="${item}">${item}</option>`}).join('\n')}
        </select>
-      <br>`
+      </li>`
       })
-      .join('\n');
+      .join('');
 
     const polyHightlightSelect = document.getElementById(id);
     polyHightlightSelect.innerHTML = html;
+
+    let checkboxes = Array.from(document.getElementsByClassName('poly-highlight-checkbox'));
+    let dropdowns = Array.from(document.getElementsByClassName('poly-highlight-dropdown'));
+
+    checkboxes.forEach((item) => {
+      item.addEventListener('change', (e) => {
+        filterAndDisplay(e)
+      });
+    });
+    dropdowns.forEach((item) => {
+      item.addEventListener('change', (e) => {
+        filterAndDisplay(e)
+      });
+    });
+
+  }
+
+  function filterAndDisplay(e) {
+    console.log(e);
+    switch (e.target.type) {
+      case 'checkbox':
+        console.log(`Checkbox ${e.target.checked}`);
+        const x = document.getElementById(`poly-highlight-${e.target.value}-dropdown`);
+        console.log(x);
+        x.selectedIndex = 0;
+        break;
+      case 'select-one':
+        console.log(`Dropdown ${e.target.value}`);
+        console.log(e.target.parentElement.firstElementChild);
+        switch (e.target.parentElement.firstElementChild.checked.toString()) {
+          case 'true':
+            console.log(`Parent checkbox already checked.`);
+            break;
+          case 'false':
+            console.log(`Parent checkbox now checked.`);
+            e.target.parentElement.firstElementChild.checked = true;
+            break;
+        }
+        break;
+    }
   }
 
   let image;
