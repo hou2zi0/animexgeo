@@ -144,6 +144,18 @@
           </form>
         </fieldset>
         <hr />
+        <!-- <select id="poly-${object.htmlId}">
+         <option value="">--Select an option--</option>
+         ${object.value.split(',').map(item => { return `<option value="${item.trim()}">${item.trim()}</option>`}).join('\n')}
+         </select> -->
+        <fieldset>
+          <legend id="hightlighting">
+            Filter by
+          </legend>
+          <div id="poly-highlight">
+
+            </select>
+        </fieldset>
         <fieldset>
           <legend>
             Clear &amp; Export
@@ -165,19 +177,19 @@
           <input type="file" id="poly-file-geojson" accept="text/json" class="btn btn-primary" style="margin-bottom: 10px;" />
           <!--  <button id="poly-overlay" class="btn btn-primary">Set overlay</button> -->
         </fieldset>
+        </div>
+      </div>
+      <div id="annotation-info">
+        <h2>Annotations</h2>
+        <div id="image-info">
+        </div>
+        <ol id="annotations">
+          <li>none yet...</li>
+        </ol>
       </div>
     </div>
-    <div id="annotation-info">
-      <h2>Annotations</h2>
-      <div id="image-info">
-      </div>
-      <ol id="annotations">
-        <li>none yet...</li>
-      </ol>
-    </div>
-  </div>
-  <script src="animexgeo.js">
-  </script>
+    <script src="animexgeo.js">
+    </script>
 </body>
 
 </html>

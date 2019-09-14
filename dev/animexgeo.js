@@ -1,3 +1,5 @@
+// Add feature to highlight pins and polygons by specific metadata
+
 function mapIt() {
 
   if (typeof POLY_METADATA === 'undefined') POLY_METADATA = [];
@@ -311,6 +313,7 @@ function mapIt() {
     polygonExport: []
   };
 
+
   var popup = L.popup();
 
   map.on('mouseover', e => {
@@ -426,6 +429,8 @@ function mapIt() {
 
       addArrayToMap();
 
+      setDropdown('poly-highlight');
+
       const ListOfAnnotations = document.getElementById('annotations');
       ListOfAnnotations.innerHTML = '';
 
@@ -479,6 +484,7 @@ function mapIt() {
                 FEATURES.addTo(map);
 
                 e.currentTarget.parentNode.remove();
+                setDropdown('poly-highlight');
               });
             }
           );
@@ -489,6 +495,52 @@ function mapIt() {
     .addEventListener("click", (e) => {
       clearCurrent();
     });
+
+  function setDropdown(id) {
+
+    function getKvPairs(featureArray) {
+
+      const listOfKeys = featureArray.reduce((accumulator, currentFeature) => {
+        return accumulator.concat(Object.keys(currentFeature.properties)
+          .filter((key) => key != 'uid'));
+      }, []);
+
+      const keyValuePairs = {};
+
+      // needs check-up
+      listOfKeys.filter((key) => key != 'uid')
+        .forEach((key) => {
+          keyValuePairs[`${key}`] = featureArray.reduce((accumulator, currentFeature) => {
+              return accumulator.concat(currentFeature.properties[`${key}`]);
+            }, [])
+            .filter(item => item);
+        });
+
+      return {
+        "pairs": keyValuePairs,
+        "keys": Object.keys(keyValuePairs)
+      };
+    }
+
+    const keyValuePairs = getKvPairs(KONST.polygonExport);
+
+    console.log(keyValuePairs);
+
+    const html = keyValuePairs.keys
+      .map((key) => {
+        return `<input type="checkbox" class="poly-highlight" id="poly-highlight-${key}" name="${key}" value="${key}" />
+      <label for="${key}">${key}</label>
+      <select id="poly-highlight-${key}-dropdown" data-key="${key}">
+       <option value="">--Select an option--</option>
+       ${keyValuePairs.pairs[`${key}`].map(item => { return `<option value="${item}">${item}</option>`}).join('\n')}
+       </select>
+      <br>`
+      })
+      .join('\n');
+
+    const polyHightlightSelect = document.getElementById(id);
+    polyHightlightSelect.innerHTML = html;
+  }
 
   let image;
 
