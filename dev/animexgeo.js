@@ -1,4 +1,5 @@
-// Add feature to highlight pins and polygons by specific metadata
+// Add feature to filter a/o highlight pins and polygons by specific metadata
+// Add feature to upload config file for properties
 
 function mapIt() {
 
@@ -583,6 +584,22 @@ function mapIt() {
     }
   }
 
+  const geojsonFileUpload = document.getElementById('poly-file-geojson');
+  geojsonFileUpload.addEventListener("change", (e) => {
+    const URL = e.target.files[0];
+    const reader = new FileReader();
+
+    if (URL) {
+      reader.readAsText(URL);
+    }
+
+    reader.addEventListener("load", (e) => {
+      //console.log(reader.result);
+      const geoJSON = JSON.parse(reader.result);
+      console.log(geoJSON);
+    }, false);
+  });
+
   let image;
 
   const AddImage = document.getElementById('poly-file')
@@ -618,11 +635,14 @@ function mapIt() {
 														<p><strong>Filename</strong>: ${URL.name}</p>
 														<p><strong>Height</strong>: ${image._image.naturalHeight} pixels</p>
 														<p><strong>Width</strong>: ${image._image.naturalWidth} pixels</p>
+                            <p><strong>Annotator</strong>: <input type="text" name="annotator-name" id="annotator-name" value="${ ['John Doe', 'Jane Doe', 'Jo Doe'][~~(Math.random() * 3)] }"></p>
 														<p><strong>Date</strong>: ${date.toLocaleDateString("de-DE")}</p>
 													</div>`;
           imageInfo.dataset.filename = URL.name;
           imageInfo.dataset.height = image._image.naturalHeight;
           imageInfo.dataset.width = image._image.naturalWidth;
+          imageInfo.dataset.annotator = document.getElementById('annotator-name')
+            .value;
           imageInfo.dataset.date = date.toLocaleDateString("de-DE");
         })
         image.addTo(map);
