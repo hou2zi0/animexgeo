@@ -6,6 +6,14 @@
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
   <style>
+    .container {
+      padding-right: 15px;
+      padding-left: 15px;
+      margin-right: auto;
+      margin-left: auto;
+      width: 95%;
+    }
+
     fieldset {
       margin-top: 5px;
     }
@@ -45,16 +53,18 @@
     /* The actual popup (appears on top) */
 
     .popup .popuptext {
+      font-size: 14px;
       visibility: hidden;
-      width: 350px;
+      width: 300px;
       background-color: #555;
       color: #fff;
       padding: 5px 10px 5px 10px;
       position: absolute;
       z-index: 1;
-      bottom: 125%;
-      right: -450%;
+      top: 2em;
+      right: -8em;
       margin-left: 0px;
+      font-weight: normal;
     }
 
     /* Toggle this class when clicking on the popup container (hide and show the popup) */
@@ -91,7 +101,7 @@
   <div class="container">
     <div class="navigation">
       <fieldset>
-        <legend>Add form field <button class="btn btn-success btn-xs" id="sub-hide-show">-</button></legend>
+        <legend id="form-field-builder">Add form field <button class="btn btn-success btn-xs sub-hide-show">-</button></legend>
         <div id="sub-fieldset">
           <p>
             <strong>Type</strong>:
@@ -117,6 +127,16 @@
           </p>
         </div>
       </fieldset>
+      <hr/>
+      <fieldset>
+        <legend id="import-form-field-config">
+          📂 Import form field config <button class="btn btn-success btn-xs sub-hide-show">-</button>
+        </legend>
+        <div id="sub-fieldset">
+          <input type="file" id="poly-file-formFieldConfig" accept="text/json" class="btn btn-primary" style="margin-bottom: 10px;" />
+          <!--  <button id="poly-overlay" class="btn btn-primary">Set overlay</button> -->
+        </div>
+      </fieldset>
     </div>
     <hr />
     <div class="row">
@@ -125,7 +145,7 @@
       </div>
       <div class="col-lg-3">
         <fieldset id="poly-data">
-          <legend>
+          <legend id="poly-data-legend">
             Geometry-Properties
           </legend>
         </fieldset>
@@ -149,7 +169,7 @@
          ${object.value.split(',').map(item => { return `<option value="${item.trim()}">${item.trim()}</option>`}).join('\n')}
          </select> -->
         <fieldset>
-          <legend id="hightlighting">
+          <legend id="highlight-help">
             ⚙️ Filter by …
           </legend>
           <ul id="poly-highlight">
@@ -157,7 +177,7 @@
           </ul>
         </fieldset>
         <fieldset>
-          <legend>
+          <legend id="clear-export-help">
             🗑️ Clear &amp; 📦 Export
           </legend>
           <button id="poly-clear" class="btn btn-primary">Clear Active</button>
@@ -180,7 +200,7 @@
       </div>
     </div>
     <div id="annotation-info">
-      <h2>Annotations</h2>
+      <h2 id="annotations-help">Annotations</h2>
       <div id="image-info">
       </div>
       <ol id="annotations">

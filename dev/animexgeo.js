@@ -1,5 +1,6 @@
 // Add feature to filter a/o highlight pins and polygons by specific metadata
 // Add feature to upload config file for properties
+// Add
 
 function mapIt() {
 
@@ -260,18 +261,24 @@ function mapIt() {
       }
     });
 
-  const hideShowButton = document.getElementById('sub-hide-show')
-    .addEventListener("click", (e) => {
-      const fieldset = document.getElementById('sub-fieldset');
-      if ((fieldset.getAttribute('class') != 'hide')) {
-        fieldset.setAttribute('class', 'hide');
-        e.currentTarget.setAttribute('class', 'btn btn-info btn-xs');
-        e.currentTarget.innerHTML = '+';
-      } else {
-        fieldset.setAttribute('class', '');
-        e.currentTarget.setAttribute('class', 'btn btn-success btn-xs');
-        e.currentTarget.innerHTML = ' - ';
-      }
+  // Klappt Elemente ein und aus
+  const subHideShowButtons = document.getElementsByClassName('sub-hide-show');
+  Array.from(subHideShowButtons)
+    .forEach((element) => {
+      element.addEventListener("click", (e) => {
+        // change fieldset to surrounding div
+        const fieldset = e.target.parentElement.nextElementSibling;
+        console.log(fieldset);
+        if ((fieldset.getAttribute('class') != 'hide')) {
+          fieldset.setAttribute('class', 'hide');
+          e.currentTarget.setAttribute('class', 'btn btn-info btn-xs');
+          e.currentTarget.innerHTML = '+';
+        } else {
+          fieldset.setAttribute('class', '');
+          e.currentTarget.setAttribute('class', 'btn btn-success btn-xs');
+          e.currentTarget.innerHTML = ' - ';
+        }
+      });
     });
 
   // Initializes the Leaflet.js map
@@ -403,6 +410,11 @@ function mapIt() {
           [],
           []
         ];
+        if (circleMarkers.length != 0) {
+          circleMarkers.forEach((circleMarker) => {
+            circleMarker.remove();
+          })
+        }
         break;
       case 'marker':
         marker.setLatLng([0, 0]);
@@ -810,37 +822,67 @@ link.onload = function() {
   //
 
   // Set helptexts
+  // <span style="background: black; color: white; border: 1px solid black; border-radius: 25px;">?</span>
 
   function setHelpTexts(array) {
     array.forEach(
       (object) => {
         const span = document.createElement("SPAN");
         span.innerHTML = `
-				<span id="${object.name}-help" class="popup">&nbsp;[❔]
+				<span id="${object.name}-help" class="popup"> &nbsp;[❔]
 					<span class="popuptext" id="${object.name}-help-popup">${object.helptext.split(/\r?\n/).join('<br>')}</span>
 				</span>`;
         document.getElementById(`${object.name}`)
           .appendChild(span);
         document.getElementById(`${object.name}-help`)
           .addEventListener("mouseover", (e) => {
-            console.log("X");
+            //console.log(e);
             var popup = document.getElementById(`${object.name}-help-popup`);
             popup.classList.toggle("show");
           });
         document.getElementById(`${object.name}-help`)
           .addEventListener("mouseout", (e) => {
-            console.log("X");
+            //console.log(e);
             var popup = document.getElementById(`${object.name}-help-popup`);
             popup.classList.toggle("show");
           });
       }
     )
   }
-
+  // import-formFieldConfig
   setHelpTexts([{
-    "name": "import-image",
-    "helptext": `You may upload a JPG- or PNG-file through a file dialogue.
+      "name": "import-image",
+      "helptext": `You may upload a JPG- or PNG-file through a file dialogue.
 								 The image will appear in the greay area on the left.`
-  }]);
+    },
+    {
+      "name": "import-form-field-config",
+      "helptext": `You may upload a JSON-file whose contents will be used to build form fields to annotate your geometries.`
+    },
+    {
+      "name": "form-field-builder",
+      "helptext": `This form field builder lets you build your own form fields used to annotate the geometries with metadata.`
+    },
+    {
+      "name": "poly-data-legend",
+      "helptext": `The annotation form fields you’ve built through the form field builder above show up here.`
+    },
+    {
+      "name": "highlight-help",
+      "helptext": `In this section you may filter your geometries based on your annotations.`
+    },
+    {
+      "name": "clear-export-help",
+      "helptext": `Using these two buttons you may either clear the active geometry you’re currently drawing or downlaod your current annotations as a GeoJSON-file.`
+    },
+    {
+      "name": "import-geojson",
+      "helptext": `You may upload a GeoJSON file whose geometries will subsequently be plotted onto your image.`
+    },
+    {
+      "name": "annotations-help",
+      "helptext": `The metadata of your annotations will show up here. You may delete annotations by clicking on the [x]-Button. When you hover on one of the map’s geometries, the corresponding annotation in this list will be highlighted.`
+    }
+  ]);
 
 };
