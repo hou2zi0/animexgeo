@@ -1,6 +1,6 @@
 // Add feature to filter a/o highlight pins and polygons by specific metadata
 // Add feature to upload config file for properties
-// Add
+// Add more info and links to helptexts
 
 function mapIt() {
 
@@ -877,7 +877,23 @@ link.onload = function() {
     },
     {
       "name": "import-geojson",
-      "helptext": `You may upload a GeoJSON file whose geometries will subsequently be plotted onto your image.`
+      "helptext": `You may upload a GeoJSON file whose geometries will subsequently be plotted onto your image. The JSON files must be of <code>"type": "FeatureCollection"</code> and contain <code>"features": []</code>. This array lists all your geometries and their respective metadata. E.g.: <pre><code>{
+    "type": "FeatureCollection",
+    "features": [{
+        "type": "Feature",
+        "properties": {
+            "Location": "Oslo",
+            "GeoNames": "3143244"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                674,
+                235
+            ]
+        }
+    }]
+}</code></pre>`
     },
     {
       "name": "annotations-help",
