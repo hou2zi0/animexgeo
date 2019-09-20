@@ -312,6 +312,69 @@ A sample GeoJSON export is shown below.
 }]
 ```
 
+## Automatic Cropping of the Annotated Geometries
+
+You may download the annotation data in a JSON-file preprocessed in order to facilitate cropping with the `Pillow`-library used for image processing in `Python`. The JSON-file looks like this:
+
+```JSON
+{
+    "image": {
+        "height": "200",
+        "width": "200",
+        "filename": "avatar.png"
+    },
+    "croppData": [
+        {
+            "boundaries": {
+                "x": 67.628702,
+                "y": 63.75,
+                "x_width": 102.624715,
+                "y_height": 90.25
+            },
+            "properties": {"uid": "6639796374739386"}
+        },
+        {
+            "boundaries": {
+                "x": 104.374516,
+                "y": 73,
+                "x_width": 130.371555,
+                "y_height": 99.75
+            },
+            "properties": {"uid": "7264638360757893"}
+        },
+        {
+            "boundaries": {
+                "x": 10.885166,
+                "y": 124,
+                "x_width": 70.62836,
+                "y_height": 177.25
+            },
+            "properties": {"uid": "48324136981436183"}
+        }
+    ]
+}
+```
+The `image`-field contains metadata about the annotated image to provide the necessary context. The `croppData`-field contains an array of JSON-objects which represent your geometries. The `properties`-field contains your annotations, the `boundaries`-field contains the pixel coordinates, calculated from the coordinates used in `Leaflet`, needed to crop the geometries from the image.
+
+The geometries may be cropped automatically as follows:
+
+```Python
+from PIL import Image
+import json
+with open('/Users/houzi/Downloads/avatar.png.cropping.json', 'r') as jsonFile:
+  jsonData = json.loads(jsonFile.read())
+imageFolder = '/user/houzi/Pictures/'
+image = Image.open(imageFolder + jsonData['image']['filename'])
+for object in jsonData['croppData']:
+  cropped = image.crop((
+    object['boundaries']['x'],
+    object['boundaries']['y'],
+    object['boundaries']['x_width'],
+    object['boundaries']['y_height']
+  ))
+  cropped.save(object['properties']['uid'])
+```
+
 
 # To Do
 
@@ -326,7 +389,7 @@ A sample GeoJSON export is shown below.
 
 The software is published under the terms of the MIT license.
 
-Copyright 2018 Max Grüntgens
+Copyright 2018–2019 Max Grüntgens (猴子)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
