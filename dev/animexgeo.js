@@ -1,6 +1,6 @@
-// Add feature to filter a/o highlight pins and polygons by specific metadata
-// Add feature to upload config file for properties
-// Add more info and links to helptexts
+// TODO: Add feature to filter a/o highlight pins and polygons by specific metadata
+// TODO: Add feature to upload config file for properties
+// TODO: Add more info and links to helptexts
 
 function mapIt() {
 
@@ -104,6 +104,13 @@ function mapIt() {
       })
   };
   // End addFormField()
+
+  document.getElementById('poly-form-field-config')
+    .addEventListener('click', (e) => {
+      console.log(POLY_METADATA);
+      prepareDownload(POLY_METADATA, `${document.getElementById("image-info").dataset.filename.replace(/\s/, '_')}.config.json`, 'raw');
+    });
+
   let geometry = 'marker';
 
   const SwitchGeometry = document.getElementById('poly-data-geometry')
@@ -168,7 +175,7 @@ function mapIt() {
       }
     });
 
-  // Prüfen
+  // TODO: Prüfen
   function geometryToString(feature) {
     switch (feature.geometry.type) {
       case 'Polygon':
@@ -203,7 +210,7 @@ function mapIt() {
 
     return popupText;
   }
-  // rename feature to item
+  // TODO: rename feature to item
   const formatAnnotationListItem = function(feature) {
 
     const aggr = Object.keys(feature.properties)
@@ -225,10 +232,11 @@ function mapIt() {
     return annotationListItemHTML;
   }
 
+  // TODO: refactor
   const SwitchShowHide = document.getElementById('poly-show-hide')
     .addEventListener("change", (e) => {
       if (e.target.value == 'show') {
-        // refactor out into function
+        // TODO: refactor out into function
         FEATURES = L.geoJSON(KONST.polygonExport, {
           onEachFeature: (feature, layer) => {
             layer.bindPopup(formatPopup(feature));
@@ -289,24 +297,78 @@ function mapIt() {
 
   const GEObutton = document.getElementById('poly-export')
     .addEventListener("click", (e) => {
-      prepareDownload(KONST.polygonExport, `${imageInfo.dataset.filename.replace(/\s/, '_')}.geo.json`);
+      //const data = KONST.polygonExport.forEach();
+      prepareDownload(data, `${document.getElementById("image-info").dataset.filename.replace(/\s/, '_')}.geo.json`, 'geojson');
     });
 
-  const prepareDownload = function(data, filename) {
-    const imageInfo = document.getElementById("image-info");
-    const content = JSON.stringify({
-        "type": "FeatureCollection",
-        "description": {
-          "filename": imageInfo.dataset.filename,
-          "height": imageInfo.dataset.height,
-          "width": imageInfo.dataset.width,
-          "annotator": document.getElementById('annotator-name')
-            .value,
-          "date": imageInfo.dataset.date
+  document.getElementById('poly-export')
+    .addEventListener("mouseover", (e) => {
+      const height = document.getElementById("image-info")
+        .dataset.height;
+      const width = document.getElementById("image-info")
+        .dataset.width;
+      const filename = document.getElementById("image-info")
+        .dataset.filename;
+      croppDictionary = {
+        image: {
+          height: height,
+          width: width,
+          filename: filename
         },
-        "features": data
+        croppData: []
+      };
+      FEATURES.eachLayer((layer) => {
+        if (layer.feature.geometry.type == 'Polygon') {
+          const bounds = L.latLngBounds(layer.feature.geometry.coordinates[0]);
+          /*
+          console.log(bounds);
+          console.log(`${layer.feature.properties.uid} =>
+            \n SW ${bounds.getSouthWest()}
+            \n SE ${bounds.getSouthEast()}
+            \n NW ${bounds.getNorthWest()}
+            \n NE ${bounds.getNorthEast()}
+            \n BB ${bounds.toBBoxString()}`);
+            */
+          const TopLeft = bounds.getSouthEast();
+          const BottomLeft = bounds.getSouthWest();
+          const TopRight = bounds.getNorthEast();
+          const croppData = {
+            boundaries: {
+              x: TopLeft.lat,
+              y: height - TopLeft.lng,
+              x_width: TopLeft.lat + (TopRight.lat - TopLeft.lat),
+              y_height: (height - TopLeft.lng) + (TopLeft.lng - BottomLeft.lng),
+            },
+            properties: layer.feature.properties,
+          };
+          croppDictionary.croppData.push(croppData);
+        }
+        console.log(croppDictionary);
       })
-      .replace(/\[null\]/g, '[[0,0]]');
+    });
+
+  const prepareDownload = function(data, filename, type) {
+    const imageInfo = document.getElementById("image-info");
+    let content;
+    if (type == 'geojson') {
+      console.log(type);
+      content = JSON.stringify({
+          "type": "FeatureCollection",
+          "description": {
+            "filename": imageInfo.dataset.filename,
+            "height": imageInfo.dataset.height,
+            "width": imageInfo.dataset.width,
+            "annotator": document.getElementById('annotator-name')
+              .value,
+            "date": imageInfo.dataset.date
+          },
+          "features": data
+        })
+        .replace(/\[null\]/g, '[[0,0]]');
+    } else {
+      content = JSON.stringify(data);
+    }
+
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
     element.setAttribute('download', filename);
@@ -349,7 +411,7 @@ function mapIt() {
 
       if (guideLines.length != 0) {
         guideLines.forEach((line) => {
-          console.log(line);
+          //console.log(line);
           line.remove();
         })
       }
@@ -365,8 +427,8 @@ function mapIt() {
           Array(lat, lng), first
         );
         const line_2 = Array(last, Array(lat, lng));
-        console.log(line_1);
-        console.log(line_2);
+        //console.log(line_1);
+        //console.log(line_2);
         const firstLine = L.polyline(line_1, {
             "dashArray": "1 10",
             "weight": 5
@@ -385,7 +447,7 @@ function mapIt() {
   });
 
   map.on('mouseover', (e) => {
-    console.log(e);
+    //console.log(e);
     document.getElementById("mapid")
       .style.cursor = "crosshair";
   });
@@ -410,9 +472,9 @@ function mapIt() {
           [],
           []
         ];
-        if (circleMarkers.length != 0) {
-          circleMarkers.forEach((circleMarker) => {
-            circleMarker.remove();
+        if (polygonEdgeMarkers.length != 0) {
+          polygonEdgeMarkers.forEach((edgeMarker) => {
+            edgeMarker.remove();
           })
         }
         break;
@@ -422,6 +484,8 @@ function mapIt() {
         break;
     }
   }
+
+  const tempPolygonEdgeMarkers = [];
 
   function addArrayToMap() {
     if (FEATURES != undefined) {
@@ -458,11 +522,134 @@ function mapIt() {
           KONST.polygonExport = KONST.polygonExport.filter((item) => {
             return item.properties.uid != UID;
           });
+          tempPolygonEdgeMarkers.filter((item) => {
+              return item.feature.properties.parentID == UID;
+            })
+            .forEach((marker) => {
+              marker.remove();
+            });
           console.log(UID);
           e.target.remove();
           document.getElementById(UID)
             .remove();
         });
+        if (feature.geometry.type == 'Polygon') {
+          //console.log('Poly');
+          //console.log(feature.geometry.coordinates[0]);
+          const UID = feature.properties.uid;
+          feature.geometry.coordinates[0].forEach((coord, index) => {
+            const edgeMarker = L.marker(Array(coord[1], coord[0]), {
+              icon: myIcon,
+              draggable: true,
+            });
+            edgeMarker.feature = {
+              properties: {
+                parentID: UID,
+                index: index
+              }
+            };
+            edgeMarker.on('move', (e) => {
+
+              if (guideLines.length != 0) {
+                guideLines.forEach((line) => {
+                  //console.log(line);
+                  line.remove();
+                })
+              }
+
+              guidelines = [];
+              const parentID = e.target.feature.properties.parentID;
+              const index = e.target.feature.properties.index;
+              console.log(parentID, index);
+              const parentPolygon = KONST.polygonExport.filter((item) => {
+                return item.properties.uid == parentID;
+              })[0];
+
+              if (parentPolygon.geometry.coordinates[0].length >= 2) {
+                let before;
+                let after;
+                if ((index == 0) || (index == (parentPolygon.geometry.coordinates[0].length - 1))) {
+                  before = parentPolygon.geometry.coordinates[0][1];
+                  after = parentPolygon.geometry.coordinates[0][parentPolygon.geometry.coordinates[0].length - 2];
+                } else {
+                  before = parentPolygon.geometry.coordinates[0][index - 1];
+                  after = parentPolygon.geometry.coordinates[0][index + 1];
+                }
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+
+                const line_1 = Array(
+                  Array(before[1], before[0]), Array(lat, lng)
+                );
+                const line_2 = Array(
+                  Array(after[1], after[0]), Array(lat, lng)
+                );
+                //console.log(line_1);
+                //console.log(line_2);
+                const firstLine = L.polyline(line_1, {
+                    "dashArray": "1 10",
+                    "weight": 5
+                  })
+                  .addTo(map);
+
+                const lastLine = L.polyline(line_2, {
+                    "dashArray": "1 10",
+                    "weight": 5
+                  })
+                  .addTo(map);
+
+                guideLines.push(firstLine);
+                guideLines.push(lastLine);
+              }
+
+
+            });
+            edgeMarker.on("dragend", (e) => {
+              const Latlng = e.target.getLatLng();
+              const lat = Latlng.lat;
+              const lng = Latlng.lng;
+              console.log('____');
+              //console.log(`edgeMarker: ${lat}, ${lng}`);
+              console.log(e.target.feature.properties);
+              const parentID = e.target.feature.properties.parentID;
+              const index = e.target.feature.properties.index;
+
+              KONST.polygonExport.forEach((o) => {
+                if (o.properties.uid == parentID) {
+                  console.log('IN');
+                  console.log(o.geometry.coordinates[0]);
+                  if ((index == 0) || (index == (o.geometry.coordinates[0].length - 1))) {
+                    console.log('in if');
+                    console.log(o.geometry.coordinates[0].length - 1);
+                    o.geometry.coordinates[0].splice(0, 1, Array(lng, lat));
+                    o.geometry.coordinates[0].splice(o.geometry.coordinates[0].length - 1, 1, Array(lng, lat));
+                  } else {
+                    o.geometry.coordinates[0].splice(index, 1, Array(lng, lat));
+                  }
+                  console.log('OUT');
+                  console.log(o.geometry.coordinates[0]);
+                }
+              });
+
+              if (tempPolygonEdgeMarkers.length != 0) {
+                tempPolygonEdgeMarkers.forEach((edgeMarker) => {
+                  edgeMarker.remove();
+                })
+              }
+              addArrayToMap();
+              //console.log(x);
+              if (guideLines.length != 0) {
+                guideLines.forEach((line) => {
+                  //console.log(line);
+                  line.remove();
+                })
+              }
+            });
+            tempPolygonEdgeMarkers.push(edgeMarker);
+            edgeMarker.addTo(map);
+          });
+        }
+        //
       }
     });
     FEATURES.addTo(map);
@@ -474,7 +661,7 @@ function mapIt() {
 
   const ADDbutton = document.getElementById('poly-add')
     .addEventListener("click", (e) => {
-      // bundle in function
+      // TODO: bundle in function
       if (geometry == 'polygon' && polygon._latlngs[1].length == 0) {
         KONST.polygonArray[1].push(Array(0, 0));
         polygon.setLatLngs(KONST.polygonArray);
@@ -522,6 +709,7 @@ function mapIt() {
 
       setDropdown('poly-highlight');
 
+      // TODO: into function
       const ListOfAnnotations = document.getElementById('annotations');
       ListOfAnnotations.innerHTML = '';
 
@@ -573,7 +761,12 @@ function mapIt() {
                   }
                 });
                 FEATURES.addTo(map);
-
+                tempPolygonEdgeMarkers.filter((item) => {
+                    return item.feature.properties.parentID == UID;
+                  })
+                  .forEach((marker) => {
+                    marker.remove();
+                  });
                 e.currentTarget.parentNode.remove();
                 setDropdown('poly-highlight');
               });
@@ -598,7 +791,7 @@ function mapIt() {
 
       const keyValuePairs = {};
 
-      // needs check-up
+      // TODO: needs check-up
       listOfKeys.filter((key) => key != 'uid')
         .forEach((key) => {
           keyValuePairs[`${key}`] = featureArray.reduce((accumulator, currentFeature) => {
@@ -752,7 +945,11 @@ function mapIt() {
     [0, 0]
   );
 
-  const circleMarkers = [];
+  const polygonEdgeMarkers = [];
+  var myIcon = L.icon({
+    iconUrl: '../data/icons/polygon_edge_icon.png',
+    iconSize: [10, 10],
+  });
 
   map.on('click', e => {
     const lat = e.latlng.lat;
@@ -760,7 +957,7 @@ function mapIt() {
     const coord = `${lat},${lng}`;
     const outline = [];
     const holes = [];
-    console.log(e.originalEvent);
+    //console.log(e.originalEvent);
 
     switch (geometry) {
       case 'polygon':
@@ -772,15 +969,23 @@ function mapIt() {
           KONST.polygonArray[0].push(Array(lat, lng));
           polygon.setLatLngs(KONST.polygonArray);
         }
-        // add erasing of circle markers; add feature ids to circleMarkers
+        // TODO: add erasing of edgeMarker markers; add feature ids to polygonEdgeMarkers
+
         KONST.polygonArray[0].forEach((coord) => {
-          const circle = L.circleMarker(coord, {
-            "radius": 5,
-            "fillOpacity": 1,
+          const edgeMarker = L.marker(coord, {
+            icon: myIcon,
+            draggable: true,
           });
-          circleMarkers.push(circle);
-          circle.addTo(map);
-        })
+          edgeMarker.on("dragend", (e) => {
+            const Latlng = e.target.getLatLng();
+            const lat = Latlng.lat;
+            const lng = Latlng.lng;
+            console.log(`edgeMarker: ${lat}, ${lng}`);
+          });
+          polygonEdgeMarkers.push(edgeMarker);
+          edgeMarker.addTo(map);
+        });
+
         break;
       case 'marker':
         marker.addTo(map);
@@ -791,7 +996,7 @@ function mapIt() {
   // End Mapit()
 }
 
-// Needs refactoring
+// TODO: Needs refactoring
 function setScript() {
   const script = document.createElement('script');
   script.onload = function() {
