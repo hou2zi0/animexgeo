@@ -506,6 +506,20 @@ function mapIt() {
 
   map.on('keydown', (e) => {
     console.log(`Code: ${e.originalEvent.code}, Key: |${e.originalEvent.key}|`);
+    switch (e.originalEvent.key) {
+      case 'Enter':
+        document.getElementById('poly-add')
+          .click()
+        break;
+      case 'Backspace':
+        document.getElementById('poly-clear')
+          .click()
+        break;
+      case 'Delete':
+        document.getElementById('poly-clear')
+          .click()
+        break;
+    }
 
   });
 
