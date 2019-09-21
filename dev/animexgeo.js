@@ -301,8 +301,8 @@ function mapIt() {
       prepareDownload(data, `${document.getElementById("image-info").dataset.filename.replace(/\s/, '_')}.geo.json`, 'geojson');
     });
 
-  document.getElementById('poly-export')
-    .addEventListener("mouseover", (e) => {
+  document.getElementById('poly-export-croppData')
+    .addEventListener("click", (e) => {
       const height = document.getElementById("image-info")
         .dataset.height;
       const width = document.getElementById("image-info")
@@ -344,7 +344,33 @@ function mapIt() {
           croppDictionary.croppData.push(croppData);
         }
         console.log(croppDictionary);
-      })
+      });
+      prepareDownload(croppDictionary, `${filename.replace(/\s/, '_')}.cropping.json`, 'raw');
+
+    });
+
+  document.getElementById('poly-croppAll')
+    .addEventListener('mouseover', (e) => {
+      var image = map.getPane('overlayPane')
+        .getElementsByTagName('img')[0];
+      //console.log(image);
+      var canvas = document.createElement('canvas');
+      canvas.width = 50;
+      canvas.height = 50;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0, 50, 50, 0, 0, 50, 50);
+      document.getElementById('cropp')
+        .appendChild(canvas);
+      //console.log(canvas.toDataURL("image/png"));
+
+      const element = document.createElement('a');
+      element.setAttribute('href', canvas.toDataURL("image/png"));
+      element.setAttribute('download', 'cropp.png');
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+
     });
 
   const prepareDownload = function(data, filename, type) {

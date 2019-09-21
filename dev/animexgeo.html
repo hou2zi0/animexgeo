@@ -192,7 +192,10 @@
             🗑️ Clear &amp; 📦 Export
           </legend>
           <button id="poly-clear" class="btn btn-primary">Clear Active</button>
+          <hr />
           <button id="poly-export" class="btn btn-primary">Export GeoJSON</button>
+          <button id="poly-export-croppData" class="btn btn-primary">Export data for cropping</button>
+          <button id="poly-croppAll" class="btn btn-primary">Cropp &amp; Download Annotations</button>
         </fieldset>
         <fieldset>
           <legend id="import-image">
@@ -218,9 +221,10 @@
         <li>none yet...</li>
       </ol>
     </div>
-  </div>
-  <script src="animexgeo.js">
-  </script>
+    <div id="cropp">
+    </div>
+    <script src="animexgeo.js">
+    </script>
 </body>
 
 </html>
