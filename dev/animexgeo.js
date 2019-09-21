@@ -504,6 +504,11 @@ function mapIt() {
       .style.cursor = "crosshair";
   });
 
+  map.on('dblclick', (e) => {
+    document.getElementById('poly-add')
+      .click()
+  });
+
   map.on('keydown', (e) => {
     console.log(`Code: ${e.originalEvent.code}, Key: |${e.originalEvent.key}|`);
     switch (e.originalEvent.key) {
@@ -517,6 +522,14 @@ function mapIt() {
         break;
       case 'Delete':
         document.getElementById('poly-clear')
+          .click()
+        break;
+      case 'm':
+        document.getElementById('marker')
+          .click()
+        break;
+      case 'p':
+        document.getElementById('polygon')
           .click()
         break;
     }
@@ -860,10 +873,10 @@ function mapIt() {
       // TODO: needs check-up
       listOfKeys.filter((key) => key != 'uid')
         .forEach((key) => {
-          keyValuePairs[`${key}`] = featureArray.reduce((accumulator, currentFeature) => {
+          keyValuePairs[`${key}`] = Array.from(new Set(featureArray.reduce((accumulator, currentFeature) => {
               return accumulator.concat(currentFeature.properties[`${key}`]);
             }, [])
-            .filter(item => item);
+            .filter(item => item)));
         });
 
       return {
@@ -908,29 +921,105 @@ function mapIt() {
 
   }
 
+  function resetHighlights() {
+    FEATURES.eachLayer((layer) => {
+      if (layer.feature.geometry.type == 'Polygon') {
+        layer.setStyle({
+          "color": "#3388ff",
+          "fillColor": "#3388ff",
+        });
+      }
+    });
+  }
+
+  function setHighlights(kvs) {
+    FEATURES.eachLayer((layer) => {
+
+      function checkIfAllTrue(truthvalue) {
+        return truthvalue == true;
+      }
+
+      const truthvalues = kvs.map((kvpair) => {
+        key = kvpair.key;
+        value = kvpair.value;
+
+        let values = (typeof layer.feature.properties[key] == 'string') ? Array(layer.feature.properties[key]) : layer.feature.properties[key];
+        if (typeof values === 'undefined') {
+          values = [];
+        }
+        console.log(`${values} ? ${value}`);
+        return values.includes(value);
+      })
+
+
+      if (truthvalues.every(checkIfAllTrue)) {
+        if (layer.feature.geometry.type == 'Polygon') {
+          layer.setStyle({
+            "color": "#ff8383",
+            "fillColor": "#ff8383",
+          });
+        }
+      }
+    });
+  }
+
   function filterAndDisplay(e) {
     console.log(e);
     switch (e.target.type) {
       case 'checkbox':
         console.log(`Checkbox ${e.target.checked}`);
+        if (e.target.checked == false) {
+          resetHighlights();
+        }
+        if (e.target.checked == true) {
+          FEATURES.eachLayer((layer) => {
+            if (Object.keys(layer.feature.properties)
+              .includes(e.target.value)) {
+              if (layer.feature.geometry.type == 'Polygon') {
+                layer.setStyle({
+                  "color": "#ff8383",
+                  "fillColor": "#ff8383",
+                });
+              }
+            }
+          });
+        }
         const x = document.getElementById(`poly-highlight-${e.target.value}-dropdown`);
-        console.log(x);
+        //console.log(x);
         x.selectedIndex = 0;
         break;
       case 'select-one':
-        console.log(`Dropdown ${e.target.value}`);
-        console.log(e.target.parentElement.firstElementChild);
+        //console.log(`Dropdown ${e.target.value}`);
+        //console.log(e.target.parentElement.firstElementChild);
         switch (e.target.parentElement.firstElementChild.checked.toString()) {
           case 'true':
-            console.log(`Parent checkbox already checked.`);
+            //console.log(`Parent checkbox already checked.`);
             break;
           case 'false':
-            console.log(`Parent checkbox now checked.`);
+            //console.log(`Parent checkbox now checked.`);
             e.target.parentElement.firstElementChild.checked = true;
             break;
         }
+        let dd = Array.from(document.getElementsByClassName('poly-highlight-dropdown'));
+        let kvs = dd.map((i) => {
+            //console.log(`Key: ${i.dataset.key} Value: ${i.value}`);
+            return {
+              key: i.dataset.key,
+              value: i.value
+            };
+          })
+          .filter((i) => {
+            return i.value != '';
+          });
+        console.log(kvs);
+
+        resetHighlights();
+        //console.log(key);
+        //console.log(value);
+        setHighlights(kvs);
         break;
     }
+
   }
 
   const geojsonFileUpload = document.getElementById('poly-file-geojson');
