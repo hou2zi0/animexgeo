@@ -933,6 +933,7 @@ function mapIt() {
   }
 
   function setHighlights(kvs) {
+    resetHighlights();
     FEATURES.eachLayer((layer) => {
 
       function checkIfAllTrue(truthvalue) {
@@ -951,8 +952,9 @@ function mapIt() {
         return values.includes(value);
       })
 
+      console.log(`${kvs} :: ${truthvalues.every(checkIfAllTrue)}`);
 
-      if (truthvalues.every(checkIfAllTrue)) {
+      if (kvs.length != 0 && truthvalues.every(checkIfAllTrue)) {
         if (layer.feature.geometry.type == 'Polygon') {
           layer.setStyle({
             "color": "#ff8383",
@@ -970,9 +972,10 @@ function mapIt() {
         console.log(`Checkbox ${e.target.checked}`);
         if (e.target.checked == false) {
           console.log('Now false…');
-          resetHighlights();
-          const x = document.getElementById(`poly-highlight-${e.target.value}-dropdown`);
-          //console.log(x);
+
+
+          let x = document.getElementById(`poly-highlight-${e.target.value}-dropdown`);
+          console.log(x);
           x.selectedIndex = 0;
 
           let dropdowns = Array.from(document.getElementsByClassName('poly-highlight-dropdown'));
@@ -991,21 +994,31 @@ function mapIt() {
           setHighlights(kvs);
         }
         if (e.target.checked == true) {
-          FEATURES.eachLayer((layer) => {
-            if (Object.keys(layer.feature.properties)
-              .includes(e.target.value)) {
-              if (layer.feature.geometry.type == 'Polygon') {
-                layer.setStyle({
-                  "color": "#ff8383",
-                  "fillColor": "#ff8383",
-                });
-              }
-            }
-          });
+          console.log('Now true…');
+
+          let x = document.getElementById(`poly-highlight-${e.target.value}-dropdown`);
+          console.log(x);
+          x.selectedIndex = 1;
+
+          let dropdowns = Array.from(document.getElementsByClassName('poly-highlight-dropdown'));
+          let kvs = dropdowns.map((i) => {
+              //console.log(`Key: ${i.dataset.key} Value: ${i.value}`);
+              return {
+                key: i.dataset.key,
+                value: i.value
+              };
+            })
+            .filter((i) => {
+              return i.value != '';
+            });
+          console.log(kvs);
+
+          //resetHighlights();
+          setHighlights(kvs);
         }
-        const x = document.getElementById(`poly-highlight-${e.target.value}-dropdown`);
+        //let x = document.getElementById(`poly-highlight-${e.target.value}-dropdown`);
         //console.log(x);
-        x.selectedIndex = 0;
+        //x.selectedIndex = 0;
         break;
       case 'select-one':
         //console.log(`Dropdown ${e.target.value}`);
@@ -1019,7 +1032,7 @@ function mapIt() {
             e.target.parentElement.firstElementChild.checked = true;
             break;
         }
-        resetHighlights();
+        //resetHighlights();
 
         let dropdowns = Array.from(document.getElementsByClassName('poly-highlight-dropdown'));
         let kvs = dropdowns.map((i) => {
