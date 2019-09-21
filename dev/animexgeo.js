@@ -320,15 +320,6 @@ function mapIt() {
       FEATURES.eachLayer((layer) => {
         if (layer.feature.geometry.type == 'Polygon') {
           const bounds = L.latLngBounds(layer.feature.geometry.coordinates[0]);
-          /*
-          console.log(bounds);
-          console.log(`${layer.feature.properties.uid} =>
-            \n SW ${bounds.getSouthWest()}
-            \n SE ${bounds.getSouthEast()}
-            \n NW ${bounds.getNorthWest()}
-            \n NE ${bounds.getNorthEast()}
-            \n BB ${bounds.toBBoxString()}`);
-            */
           const TopLeft = bounds.getSouthEast();
           const BottomLeft = bounds.getSouthWest();
           const TopRight = bounds.getNorthEast();
@@ -350,26 +341,61 @@ function mapIt() {
     });
 
   document.getElementById('poly-croppAll')
-    .addEventListener('mouseover', (e) => {
-      var image = map.getPane('overlayPane')
-        .getElementsByTagName('img')[0];
-      //console.log(image);
-      var canvas = document.createElement('canvas');
-      canvas.width = 50;
-      canvas.height = 50;
-      var ctx = canvas.getContext('2d');
-      ctx.drawImage(image, 0, 0, 50, 50, 0, 0, 50, 50);
-      document.getElementById('cropp')
-        .appendChild(canvas);
-      //console.log(canvas.toDataURL("image/png"));
+    .addEventListener('click', (e) => {
+      //Cropping
 
-      const element = document.createElement('a');
-      element.setAttribute('href', canvas.toDataURL("image/png"));
-      element.setAttribute('download', 'cropp.png');
-      element.style.display = 'none';
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
+      const height = document.getElementById("image-info")
+        .dataset.height;
+      const width = document.getElementById("image-info")
+        .dataset.width;
+      const filename = document.getElementById("image-info")
+        .dataset.filename;
+
+      FEATURES.eachLayer((layer) => {
+        if (layer.feature.geometry.type == 'Polygon') {
+          const bounds = L.latLngBounds(layer.feature.geometry.coordinates[0]);
+          console.log(bounds);
+          const TopLeft = bounds.getSouthEast();
+          const BottomLeft = bounds.getSouthWest();
+          const TopRight = bounds.getNorthEast();
+          const croppData = {
+            boundaries: {
+              x: TopLeft.lat,
+              y: height - TopLeft.lng,
+              x_width: TopRight.lat - TopLeft.lat,
+              y_height: TopLeft.lng - BottomLeft.lng,
+            },
+            properties: layer.feature.properties,
+          };
+          console.log(croppData);
+
+          var image = map.getPane('overlayPane')
+            .getElementsByTagName('img')[0];
+          //console.log(image);
+          var canvas = document.createElement('canvas');
+          canvas.width = croppData.boundaries.x_width;
+          canvas.height = croppData.boundaries.y_height;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(image,
+            croppData.boundaries.x, croppData.boundaries.y,
+            croppData.boundaries.x_width, croppData.boundaries.y_height,
+            0, 0,
+            croppData.boundaries.x_width, croppData.boundaries.y_height);
+          document.getElementById('cropp')
+            .appendChild(canvas);
+          //console.log(canvas.toDataURL("image/png"));
+
+          const element = document.createElement('a');
+          element.setAttribute('href', canvas.toDataURL("image/png"));
+          element.setAttribute('download', `${croppData.properties.uid}_cropped_from_${filename}.png`);
+          element.style.display = 'none';
+          document.body.appendChild(element);
+          element.click();
+          document.body.removeChild(element);
+          canvas.remove();
+        }
+
+      });
 
     });
 
