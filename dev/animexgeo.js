@@ -969,7 +969,26 @@ function mapIt() {
       case 'checkbox':
         console.log(`Checkbox ${e.target.checked}`);
         if (e.target.checked == false) {
+          console.log('Now false…');
           resetHighlights();
+          const x = document.getElementById(`poly-highlight-${e.target.value}-dropdown`);
+          //console.log(x);
+          x.selectedIndex = 0;
+
+          let dropdowns = Array.from(document.getElementsByClassName('poly-highlight-dropdown'));
+          let kvs = dropdowns.map((i) => {
+              //console.log(`Key: ${i.dataset.key} Value: ${i.value}`);
+              return {
+                key: i.dataset.key,
+                value: i.value
+              };
+            })
+            .filter((i) => {
+              return i.value != '';
+            });
+          console.log(kvs);
+
+          setHighlights(kvs);
         }
         if (e.target.checked == true) {
           FEATURES.eachLayer((layer) => {
@@ -1000,8 +1019,10 @@ function mapIt() {
             e.target.parentElement.firstElementChild.checked = true;
             break;
         }
-        let dd = Array.from(document.getElementsByClassName('poly-highlight-dropdown'));
-        let kvs = dd.map((i) => {
+        resetHighlights();
+
+        let dropdowns = Array.from(document.getElementsByClassName('poly-highlight-dropdown'));
+        let kvs = dropdowns.map((i) => {
             //console.log(`Key: ${i.dataset.key} Value: ${i.value}`);
             return {
               key: i.dataset.key,
@@ -1013,9 +1034,6 @@ function mapIt() {
           });
         console.log(kvs);
 
-        resetHighlights();
-        //console.log(key);
-        //console.log(value);
         setHighlights(kvs);
         break;
     }
