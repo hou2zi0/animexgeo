@@ -7,7 +7,8 @@ function mapIt() {
   if (typeof POLY_METADATA === 'undefined') POLY_METADATA = [];
 
   // Begin addFormField()
-  const addFormField = function() {
+  // TODO: refactor for processing of config json
+  function addFormField() {
 
     const fieldset = document.getElementById("poly-data");
     const paragraph = document.createElement('p');
@@ -47,7 +48,7 @@ function mapIt() {
         break;
         // text area
       case 'textarea':
-        paragraph.innerHTML = `<label for="${object.htmlId}">${object.label}</label>: ${x_button}<br/><textarea id="poly-${object.htmlId}" name="${object.htmlId}" rows="3" wrap="hard" style="width:100%;">Freitextfeld</textarea>`;
+        paragraph.innerHTML = `<label for="${object.htmlId}">${object.label}</label>: ${x_button}<br/><textarea id="poly-${object.htmlId}" name="${object.htmlId}" rows="3" wrap="hard" style="width:100%;">${object.value}</textarea>`;
         break;
         // urls
         // case 'urls':
@@ -126,8 +127,23 @@ function mapIt() {
 
   const SelectSubType = document.getElementById('sub-type')
     .addEventListener("change", (e) => {
+
       const subtype = document.getElementById('sub-type');
+
+      if (subtype.value != 'object') {
+        document.getElementById('sub-value')
+          .parentElement
+          .innerHTML = '<strong>Value(s)</strong>: <input type="text" value="Lorem ipsum dolor sit …" id="sub-value" style="width:80%;"><br />';
+      }
+
+      let subLabel = document.getElementById('sub-label');
+      let subValue = document.getElementById('sub-value');
+
       if ((subtype.value == 'text')) {
+
+        subLabel.value = 'Text';
+        subValue.value = 'My short text string…';
+
         const span = document.createElement('span');
         span.setAttribute('id', 'span-sep');
         span.innerHTML = `<button class="btn btn-default btn-xs" id="sub-sep">Separator</button>`;
@@ -172,8 +188,126 @@ function mapIt() {
           document.getElementById('sub-separator-label')
             .remove();
         }
+
+        switch (subtype.value) {
+          case 'date':
+            subLabel.value = 'Date';
+            subValue.value = '28.09.1066';
+            break;
+          case 'textarea':
+            subLabel.value = 'Textfield';
+            subValue.value = 'Lorem ipsum dolor sit …';
+            break;
+          case 'dropdown':
+            subLabel.value = 'Dropdown';
+            subValue.value = 'Option A, Option B';
+            break;
+          case 'checkbox':
+            subLabel.value = 'Checkbox';
+            subValue.value = 'Option A, Option B';
+            break;
+          case 'image':
+            subLabel.value = 'Image';
+            subValue.value = '';
+            subValue.placeholder = "https://example.com";
+            break;
+          case 'object':
+            subLabel.value = 'Object';
+            let newEl = document.createElement('div');
+            newEl.id = 'sub-value';
+            subValue.parentNode.replaceChild(newEl, subValue);
+            //newEl.parentNode.insertBefore(document.createElement('BR'), newEl);
+            let newDataRow = document.createElement('code');
+            newDataRow.dataset.key = '';
+            newDataRow.dataset.value = '';
+            newDataRow.classList.add('object-data-row');
+            newDataRow.style = 'padding: 10px 10px;';
+            let inputKey = document.createElement('input');
+            inputKey.type = "text";
+            inputKey.style = 'margin: 5px 5px;';
+            inputKey.classList.add('object-data-row-input');
+            let inputValue = document.createElement('input');
+            inputValue.type = "text";
+            inputValue.style = 'margin: 5px 5px;';
+            inputValue.classList.add('object-data-row-input');
+            newDataRow.appendChild(document.createTextNode('"'))
+            newDataRow.appendChild(inputKey);
+            newDataRow.appendChild(document.createTextNode('" : "'))
+            newDataRow.appendChild(inputValue);
+            newDataRow.appendChild(document.createTextNode('"'))
+            newEl.appendChild(newDataRow);
+            let addButton = document.createElement('button');
+            addButton.innerHTML = '+';
+            newEl.appendChild(addButton);
+
+            addButton.addEventListener('click', (e) => {
+              addDataRow(e);
+            });
+
+            inputKey.addEventListener('input', (e) => {
+              e.target.parentNode.dataset.key = e.target.value;
+              let p = e.target.parentNode.dataset.key;
+              console.log(`Key: ${p}`);
+            });
+            inputValue.addEventListener('input', (e) => {
+              e.target.parentNode.dataset.value = e.target.value;
+              let p = e.target.parentNode.dataset.value;
+              console.log(`Value: ${p}`);
+            });
+            break;
+        }
       }
     });
+
+  // TODO: Add Button:
+  function addDataRow(e) {
+    let parent = document.getElementById('sub-value');
+    let br = document.createElement('BR');
+    let newDataRow = document.createElement('code');
+    newDataRow.dataset.key = '';
+    newDataRow.dataset.value = '';
+    newDataRow.classList.add('object-data-row');
+    newDataRow.style = 'padding: 10px 10px;';
+    let inputKey = document.createElement('input');
+    inputKey.type = "text";
+    inputKey.style = 'margin: 5px 5px;';
+    inputKey.classList.add('object-data-row-input');
+    let inputValue = document.createElement('input');
+    inputValue.type = "text";
+    inputValue.style = 'margin: 5px 5px;';
+    inputValue.classList.add('object-data-row-input');
+    newDataRow.appendChild(document.createTextNode('"'))
+    newDataRow.appendChild(inputKey);
+    newDataRow.appendChild(document.createTextNode('" : "'))
+    newDataRow.appendChild(inputValue);
+    newDataRow.appendChild(document.createTextNode('"'))
+    let outerSpan = document.createElement('span');
+    outerSpan.appendChild(br);
+    outerSpan.appendChild(newDataRow);
+    parent.appendChild(outerSpan);
+    let addButton = document.createElement('button');
+    addButton.innerHTML = '+';
+    outerSpan.appendChild(addButton);
+    addButton.addEventListener('click', (e) => {
+      addDataRow(e);
+    });
+    let deleteButton = document.createElement('button');
+    deleteButton.innerHTML = '-';
+    outerSpan.appendChild(deleteButton);
+    deleteButton.addEventListener('click', (e) => {
+      e.target.parentElement.remove();
+    });
+    inputKey.addEventListener('input', (e) => {
+      e.target.parentNode.dataset.key = e.target.value;
+      let p = e.target.parentNode.dataset.key;
+      console.log(`Key: ${p}`);
+    });
+    inputValue.addEventListener('input', (e) => {
+      e.target.parentNode.dataset.value = e.target.value;
+      let p = e.target.parentNode.dataset.value;
+      console.log(`Value: ${p}`);
+    });
+  };
 
   // TODO: Prüfen
   function geometryToString(feature) {
@@ -191,7 +325,7 @@ function mapIt() {
     }
   }
 
-  const formatPopup = function(feature) {
+  function formatPopup(feature) {
 
     const aggr = Object.keys(feature.properties)
       .map((key) => {
@@ -399,7 +533,7 @@ function mapIt() {
 
     });
 
-  const prepareDownload = function(data, filename, type) {
+  function prepareDownload(data, filename, type) {
     const imageInfo = document.getElementById("image-info");
     let content;
     if (type == 'geojson') {
@@ -896,7 +1030,7 @@ function mapIt() {
         <label for="${key}">${key}</label>
         <select id="poly-highlight-${key}-dropdown" data-key="${key}" class="poly-highlight-dropdown">
         <option value="">--Select an option--</option>
-        ${keyValuePairs.pairs[`${key}`].map(item => { return `<option value="${item}">${item}</option>`}).join('\n')}
+        ${keyValuePairs.pairs[`${key}`].map(item => { return `<option value="${item}">${item.length > 25 ? item.slice(0,25)+'…' : item}</option>`}).join('\n')}
        </select>
       </li>`
       })
@@ -1066,6 +1200,25 @@ function mapIt() {
       //console.log(reader.result);
       const geoJSON = JSON.parse(reader.result);
       console.log(geoJSON);
+      // TODO: map geojson FeatureCollection
+    }, false);
+  });
+
+  const formFieldConfigFileUpload = document.getElementById('poly-file-formFieldConfig');
+  formFieldConfigFileUpload.addEventListener("change", (e) => {
+    const URL = e.target.files[0];
+    const reader = new FileReader();
+
+    if (URL) {
+      reader.readAsText(URL);
+    }
+
+    reader.addEventListener("load", (e) => {
+      //console.log(reader.result);
+      configJSON = JSON.parse(reader.result);
+      POLY_METADATA = configJSON;
+      console.log(POLY_METADATA);
+      // addFormFields
     }, false);
   });
 
@@ -1180,71 +1333,11 @@ function mapIt() {
     }
   });
   // End Mapit()
-}
 
-// TODO: Needs refactoring
-function setScript() {
-  const script = document.createElement('script');
-  script.onload = function() {
-    mapIt();
-    //
-  };
-  //1.3.1
-  script.src = "https://unpkg.com/leaflet@1.5.0/dist/leaflet.js";
-  //script.integrity = "sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==";
-  script.setAttribute('crossorigin', '');
-
-  document.head.appendChild(script);
-}
-
-const link = document.createElement('link');
-link.setAttribute('rel', 'stylesheet');
-link.setAttribute('href', 'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css');
-link.setAttribute('integrity', 'sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==')
-link.setAttribute('crossorigin', '');
-document.head.appendChild(link);
-link.onload = function() {
-
-  const style = document.createElement('style');
-  style.innerText = "#mapid{ height: 800px; }"
-
-  document.head.appendChild(style);
-  setScript();
-  //
-
-  // Set helptexts
-  // <span style="background: black; color: white; border: 1px solid black; border-radius: 25px;">?</span>
-
-  function setHelpTexts(array) {
-    array.forEach(
-      (object) => {
-        const span = document.createElement("SPAN");
-        span.innerHTML = `
-				<span id="${object.name}-help" class="popup"> &nbsp;[❔]
-					<span class="popuptext" id="${object.name}-help-popup">${object.helptext.split(/\r?\n/).join('<br>')}</span>
-				</span>`;
-        document.getElementById(`${object.name}`)
-          .appendChild(span);
-        document.getElementById(`${object.name}-help`)
-          .addEventListener("mouseover", (e) => {
-            //console.log(e);
-            var popup = document.getElementById(`${object.name}-help-popup`);
-            popup.classList.toggle("show");
-          });
-        document.getElementById(`${object.name}-help`)
-          .addEventListener("mouseout", (e) => {
-            //console.log(e);
-            var popup = document.getElementById(`${object.name}-help-popup`);
-            popup.classList.toggle("show");
-          });
-      }
-    )
-  }
-  // import-formFieldConfig
-  setHelpTexts([{
+  const helpTexts = [{
       "name": "import-image",
       "helptext": `You may upload a JPG- or PNG-file through a file dialogue.
-								 The image will appear in the greay area on the left.`
+                 The image will appear in the greay area on the left.`
     },
     {
       "name": "import-form-field-config",
@@ -1284,12 +1377,70 @@ link.onload = function() {
             ]
         }
     }]
-}</code></pre>`
+  }</code></pre>`
     },
     {
       "name": "annotations-help",
       "helptext": `The metadata of your annotations will show up here. You may delete annotations by clicking on the [x]-Button. When you hover on one of the map’s geometries, the corresponding annotation in this list will be highlighted.`
     }
-  ]);
+  ];
+  setHelpTexts(helpTexts);
+}
+
+function setHelpTexts(array) {
+  array.forEach(
+    (object) => {
+      const span = document.createElement("SPAN");
+      span.innerHTML = `
+      <span id="${object.name}-help" class="popup"> &nbsp;[❔]
+        <span class="popuptext" id="${object.name}-help-popup">${object.helptext.split(/\r?\n/).join('<br>')}</span>
+      </span>`;
+      document.getElementById(`${object.name}`)
+        .appendChild(span);
+      document.getElementById(`${object.name}-help`)
+        .addEventListener("mouseover", (e) => {
+          //console.log(e);
+          var popup = document.getElementById(`${object.name}-help-popup`);
+          popup.classList.toggle("show");
+        });
+      document.getElementById(`${object.name}-help`)
+        .addEventListener("mouseout", (e) => {
+          //console.log(e);
+          var popup = document.getElementById(`${object.name}-help-popup`);
+          popup.classList.toggle("show");
+        });
+    }
+  )
+}
+
+// TODO: Needs refactoring
+function setScript() {
+  const script = document.createElement('script');
+  script.onload = function() {
+    //
+    mapIt();
+    //
+  };
+  //1.3.1
+  script.src = "https://unpkg.com/leaflet@1.5.0/dist/leaflet.js";
+  //script.integrity = "sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==";
+  script.setAttribute('crossorigin', '');
+
+  document.head.appendChild(script);
+}
+
+const link = document.createElement('link');
+link.setAttribute('rel', 'stylesheet');
+link.setAttribute('href', 'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css');
+link.setAttribute('integrity', 'sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==')
+link.setAttribute('crossorigin', '');
+document.head.appendChild(link);
+link.onload = function() {
+
+  const style = document.createElement('style');
+  style.innerText = "#mapid{ height: 800px; }"
+
+  document.head.appendChild(style);
+  setScript();
 
 };
