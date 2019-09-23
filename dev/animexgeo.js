@@ -25,7 +25,8 @@ function mapIt() {
       "type": (document.getElementById('sub-type')
           .value) ? document.getElementById('sub-type')
         .value : 'text',
-      "value": document.getElementById('sub-value')
+      "value": Array.from(document.getElementsByClassName('object-data-row'))
+        .length > 0 ? Array.from(document.getElementsByClassName('object-data-row')) : document.getElementById('sub-value')
         .value,
       "htmlId": `${labelID}`,
       "propertyId": `${labelID}`,
@@ -85,6 +86,17 @@ function mapIt() {
                 ${min}
                 ${max}
                 />`;
+        break;
+      case 'object':
+        //let objectDataRows = Array.from(document.getElementsByClassName('object-data-row'));
+        let html = object.value.map((item) => {
+          return `\t"${item.dataset.key}": "<input type='text' value='${item.dataset.key}'></input>"`
+        });
+        paragraph.innerHTML = `
+        <label for="${object.htmlId}">${object.label}</label> ${x_button}:
+        <pre><code>{
+${html.join('\n')}
+ }</code></pre>`;
         break;
     }
     POLY_METADATA.push(object);
