@@ -90,7 +90,7 @@ function mapIt() {
       case 'object':
         //let objectDataRows = Array.from(document.getElementsByClassName('object-data-row'));
         let html = object.value.map((item) => {
-          return `\t"${item.dataset.key}": "<input type='text' value='${item.dataset.key}'></input>"`
+          return `\t"${item.dataset.key}": "<input type='text' data-key='${item.dataset.key}' value='${item.dataset.value}'></input>"`
         });
         paragraph.innerHTML = `
         <label for="${object.htmlId}">${object.label}</label> ${x_button}:
@@ -901,6 +901,8 @@ ${html.join('\n')}
           break;
       }
 
+      // TODO: Set HTML IDs to unique value?
+      // TODO: Refactor to switch case, add case for object
       POLY_METADATA.forEach(object => {
         let value;
         if (object.type == 'checkbox') {
