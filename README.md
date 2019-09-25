@@ -363,7 +363,7 @@ from PIL import Image
 import json
 with open('/Users/houzi/Downloads/avatar.png.cropping.json', 'r') as jsonFile:
   jsonData = json.loads(jsonFile.read())
-imageFolder = '/user/houzi/Pictures/'
+imageFolder = '/Users/houzi/Pictures/'
 image = Image.open(imageFolder + jsonData['image']['filename'])
 for object in jsonData['croppData']:
   cropped = image.crop((
@@ -372,7 +372,7 @@ for object in jsonData['croppData']:
     object['boundaries']['x_width'],
     object['boundaries']['y_height']
   ))
-  cropped.save(object['properties']['uid'])
+  cropped.save(object['properties']['uid'] + '.png')
 ```
 
 
