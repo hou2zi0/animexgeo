@@ -1,6 +1,7 @@
 // TODO: Add feature to filter a/o highlight pins and polygons by specific metadata
 // TODO: Add feature to upload config file for properties
 // TODO: Add more info and links to helptexts
+// TODO: Add list option to form fields
 
 function mapIt() {
 
@@ -124,11 +125,12 @@ ${html.join('\n')}
       prepareDownload(POLY_METADATA, `${document.getElementById("image-info").dataset.filename.replace(/\s/, '_')}.config.json`, 'raw');
     });
 
-  let geometry = 'marker';
+  let geometry = 'polygon';
 
   const SwitchGeometry = document.getElementById('poly-data-geometry')
     .addEventListener("change", (e) => {
-      console.log(e.target.value);
+      //console.log(e.target.value);
+      clearCurrent();
       geometry = e.target.value;
     });
 
@@ -700,6 +702,11 @@ ${html.join('\n')}
         if (polygonEdgeMarkers.length != 0) {
           polygonEdgeMarkers.forEach((edgeMarker) => {
             edgeMarker.remove();
+          })
+        }
+        if (guideLines.length != 0) {
+          guideLines.forEach((guideline) => {
+            guideline.remove();
           })
         }
         break;
@@ -1371,7 +1378,7 @@ ${html.join('\n')}
     },
     {
       "name": "clear-export-help",
-      "helptext": `Using these two buttons you may either clear the active geometry you’re currently drawing or downlaod your current annotations as a GeoJSON-file.`
+      "helptext": `Using these two buttons you may either clear the active geometry you’re currently drawing or downlaod your current annotations as a GeoJSON-file, as a JSON-file bundling pixel coordinates for cropping in Python’s Image-Library Pillow, or you may cropp and download your geometries directly in the browser.`
     },
     {
       "name": "import-geojson",

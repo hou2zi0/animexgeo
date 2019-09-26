@@ -104,6 +104,10 @@
         opacity: 1;
       }
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
@@ -124,6 +128,7 @@
               <!-- <option value="urls">URLs</option> -->
               <option value="image">Image</option>
               <!--<option value="object">Object</option>-->
+              <!--<option value="list">List</option>-->
             </select>
           </p>
           <p id="sub-type-separator"></p>
@@ -138,8 +143,8 @@
           </p>
         </div>
       </fieldset>
-      <hr />
-      <fieldset>
+      <hr class="hidden" />
+      <fieldset class="hidden">
         <legend id="import-form-field-config">
           📂 Import form field config <button class="btn btn-success btn-xs sub-hide-show">-</button>
         </legend>
@@ -149,7 +154,7 @@
         </div>
       </fieldset>
     </div>
-    <hr />
+    <hr style="margin-top: 0px; margin-bottom: 0px;" />
     <div class="row">
       <div class="col-lg-9">
         <div id="mapid"></div>
@@ -160,12 +165,12 @@
             Geometry-Properties
           </legend>
         </fieldset>
-        <p><button id="poly-form-field-config" class="btn btn-primary">Export form fields configuration</button></p>
-        <hr />
+        <p class="hidden"><button id="poly-form-field-config" class="btn btn-primary">Export form fields configuration</button></p>
+        <hr style="margin-top: 0px; margin-bottom: 0px;" />
         <fieldset>
           <form id="poly-data-geometry">
-            <input type="radio" name="geometry" value="marker" id="marker" checked><label for="marker">&nbsp;📍 Marker</label><br>
-            <input type="radio" name="geometry" value="polygon" id="polygon"><label for="polygon">&nbsp;🛆 Polygon</label>
+            <input type="radio" name="geometry" value="polygon" id="polygon" checked><label for="polygon">&nbsp;🛆 Polygon</label>
+            <input type="radio" name="geometry" value="marker" id="marker"><label for="marker">&nbsp;📍 Marker</label>
           </form>
           <button id="poly-add" class="btn btn-primary">➕ Add current geometry</button>
         </fieldset>
@@ -175,7 +180,7 @@
             <input type="radio" name="visibility" value="hide" id="hide" checked><label for="hide">&nbsp;Hide</label>
           </form>
         </fieldset>
-        <hr />
+        <hr style="margin-top: 0px; margin-bottom: 0px;" />
         <!-- <select id="poly-${object.htmlId}">
          <option value="">--Select an option--</option>
          ${object.value.split(',').map(item => { return `<option value="${item.trim()}">${item.trim()}</option>`}).join('\n')}
@@ -193,7 +198,7 @@
             🗑️ Clear &amp; 📦 Export
           </legend>
           <button id="poly-clear" class="btn btn-primary">Clear Active</button>
-          <hr />
+          <hr style="margin-top: 5px; margin-bottom: 5px;" />
           <button id="poly-export" class="btn btn-primary">Export GeoJSON</button>
           <button id="poly-export-croppData" class="btn btn-primary">Export data for cropping</button>
           <button id="poly-croppAll" class="btn btn-primary">Cropp &amp; Download Annotations</button>
