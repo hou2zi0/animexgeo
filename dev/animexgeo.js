@@ -445,7 +445,7 @@ ${html.join('\n')}
 
   const GEObutton = document.getElementById('poly-export')
     .addEventListener("click", (e) => {
-      //const data = KONST.polygonExport.forEach();
+      const data = KONST.polygonExport;
       prepareDownload(data, `${document.getElementById("image-info").dataset.filename.replace(/\s/, '_')}.geo.json`, 'geojson');
     });
 
@@ -457,14 +457,20 @@ ${html.join('\n')}
         .dataset.width;
       const filename = document.getElementById("image-info")
         .dataset.filename;
+
+
       croppDictionary = {
         image: {
           height: height,
           width: width,
-          filename: filename
+          filename: filename,
+          annotator: document.getElementById('annotator-name')
+            .value,
+          date: imageInfo.dataset.date
         },
         croppData: []
       };
+
       FEATURES.eachLayer((layer) => {
         if (layer.feature.geometry.type == 'Polygon') {
           const bounds = L.latLngBounds(layer.feature.geometry.coordinates[0]);
@@ -648,8 +654,7 @@ ${html.join('\n')}
 
   map.on('mouseover', (e) => {
     //console.log(e);
-    document.getElementById("mapid")
-      .style.cursor = "crosshair";
+    //document.getElementById("mapid").style.cursor = "pointer";
   });
 
   map.on('dblclick', (e) => {
