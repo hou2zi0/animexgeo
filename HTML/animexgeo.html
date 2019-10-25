@@ -2,8 +2,26 @@
 
 <head>
   <title>Annotate images &amp; export GeoJSON</title>
+  <meta charset="UTF-8">
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
   <style>
+    .container {
+      padding-right: 15px;
+      padding-left: 15px;
+      margin-right: auto;
+      margin-left: auto;
+      width: 95%;
+    }
+
+    pre code {
+      padding: 2px 4px;
+      font-size: 90%;
+      color: #c7254e;
+      background-color: #f9f2f4;
+      border-radius: 4px;
+    }
+
     fieldset {
       margin-top: 5px;
     }
@@ -16,6 +34,80 @@
     .hide {
       display: none;
     }
+
+    ol#annotations {
+      padding-left: 0px !important;
+    }
+
+    li.annotation {
+      list-style-type: none;
+      background: #d3d3d345;
+      margin-bottom: 0.5em;
+      padding: 0.5em 1em 0.5em 1em;
+    }
+
+    .focus {
+      background: #d3d3d3 !important;
+    }
+
+    /* Popup container */
+
+    .popup {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    /* The actual popup (appears on top) */
+
+    .popup .popuptext {
+      font-size: 14px;
+      visibility: hidden;
+      width: 300px;
+      background-color: #555;
+      color: #fff;
+      padding: 5px 10px 5px 10px;
+      position: absolute;
+      z-index: 1;
+      top: 2em;
+      right: -8em;
+      margin-left: 0px;
+      font-weight: normal;
+    }
+
+    /* Toggle this class when clicking on the popup container (hide and show the popup) */
+
+    .popup .show {
+      visibility: visible;
+      -webkit-animation: fadeIn 1s;
+      animation: fadeIn 1s
+    }
+
+    /* Add animation (fade in the popup) */
+
+    @-webkit-keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
@@ -23,123 +115,131 @@
   <div class="container">
     <div class="navigation">
       <fieldset>
-        <legend>Add form field <button class="btn btn-success btn-xs" id="sub-hide-show">-</button></legend>
+        <legend id="form-field-builder">Add form field <button class="btn btn-success btn-xs sub-hide-show">-</button></legend>
         <div id="sub-fieldset">
           <p>
             <strong>Type</strong>:
             <select id="sub-type">
-          <option value="textarea">Textarea</option>
-          <option value="text">Text</option>
-          <option value="dropdown">Dropdown</option>
-          <option value="checkbox">Checkbox</option>
-          <option value="date">Datepicker</option>
-        </select>
+              <option value="textarea">Textarea</option>
+              <option value="text">Text</option>
+              <option value="dropdown">Dropdown</option>
+              <option value="checkbox">Checkbox</option>
+              <option value="date">Datepicker</option>
+              <!-- <option value="urls">URLs</option> -->
+              <option value="image">Image</option>
+              <!--<option value="object">Object</option>-->
+              <!--<option value="list">List</option>-->
+            </select>
           </p>
           <p id="sub-type-separator"></p>
           <p>
-            <strong>Value(s)</strong>: <input type="text" value="Value" id="sub-value" style="width:80%;"><br />
+            <strong>Label</strong>: <input type="text" value="Textfield" id="sub-label" style="width:80%;"><br />
           </p>
           <p>
-            <strong>Label</strong>: <input type="text" value="Label" id="sub-label" style="width:80%;"><br />
+            <strong>Value(s)</strong>: <input type="text" value="Lorem ipsum dolor sit …" id="sub-value" style="width:80%;"><br />
           </p>
           <p>
             <button class="btn btn-default" id="sub-formField">Add form field</button>
           </p>
         </div>
       </fieldset>
+      <hr class="hidden" />
+      <fieldset class="hidden">
+        <legend id="import-form-field-config">
+          📂 Import form field config <button class="btn btn-success btn-xs sub-hide-show">-</button>
+        </legend>
+        <div id="sub-fieldset">
+          <input type="file" id="poly-file-formFieldConfig" accept="text/json" class="btn btn-primary" style="margin-bottom: 10px;" />
+          <!--  <button id="poly-overlay" class="btn btn-primary">Set overlay</button> -->
+        </div>
+      </fieldset>
     </div>
-    <hr />
+    <hr style="margin-top: 0px; margin-bottom: 0px;" />
     <div class="row">
       <div class="col-lg-9">
         <div id="mapid"></div>
       </div>
       <div class="col-lg-3">
         <fieldset id="poly-data">
-          <legend>
-            Add Polygon-Properties
+          <legend id="poly-data-legend">
+            Geometry-Properties
           </legend>
         </fieldset>
-        <hr />
-        <div class="row" id="poly-data-button">
-          <div class="col-lg-6">
-            <button id="poly-add" class="btn btn-lg btn-primary">Add Polygon</button>
-          </div>
-          <div class="col-lg-3">
-            <button id="poly-show" class="btn  btn-primary">Show</button>
-          </div>
-          <div class="col-lg-3">
-            <button id="poly-hide" class="btn  btn-primary">Hide</button>
-          </div>
-        </div>
-        <hr />
+        <p class="hidden"><button id="poly-form-field-config" class="btn btn-primary">Export form fields configuration</button></p>
+        <hr style="margin-top: 0px; margin-bottom: 0px;" />
         <fieldset>
-          <legend>
-            Clear &amp; Export
+          <form id="poly-data-geometry">
+            <input type="radio" name="geometry" value="polygon" id="polygon" checked><label for="polygon">&nbsp;🛆 Polygon</label>
+            <input type="radio" name="geometry" value="marker" id="marker"><label for="marker">&nbsp;📍 Marker</label>
+          </form>
+          <button id="poly-add" class="btn btn-primary">➕ Add current geometry</button>
+        </fieldset>
+        <fieldset>
+          <form id="poly-show-hide">
+            <input type="radio" name="visibility" value="show" id="show"><label for="show">&nbsp;Show</label><br>
+            <input type="radio" name="visibility" value="hide" id="hide" checked><label for="hide">&nbsp;Hide</label>
+          </form>
+        </fieldset>
+        <hr style="margin-top: 0px; margin-bottom: 0px;" />
+        <!-- <select id="poly-${object.htmlId}">
+         <option value="">--Select an option--</option>
+         ${object.value.split(',').map(item => { return `<option value="${item.trim()}">${item.trim()}</option>`}).join('\n')}
+         </select> -->
+        <fieldset>
+          <legend id="highlight-help">
+            ⚙️ Filter by …
+          </legend>
+          <ul id="poly-highlight">
+
+          </ul>
+        </fieldset>
+        <fieldset>
+          <legend id="clear-export-help">
+            🗑️ Clear &amp; 📦 Export
           </legend>
           <button id="poly-clear" class="btn btn-primary">Clear Active</button>
-          <button id="poly-export" class="btn btn-primary">Export JSON</button>
+          <hr style="margin-top: 5px; margin-bottom: 5px;" />
+          <button id="poly-export" class="btn btn-primary">Export GeoJSON</button>
+          <button id="poly-export-croppData" class="btn btn-primary">Export data for cropping</button>
+          <button id="poly-croppAll" class="btn btn-primary">Cropp &amp; Download Annotations</button>
         </fieldset>
         <fieldset>
-          <legend>
-            Import image
+          <legend id="import-image">
+            🗺️ Import image
           </legend>
           <input type="file" id="poly-file" accept="image/png, image/jpeg" class="btn btn-primary" style="margin-bottom: 10px;" />
-          <button id="poly-overlay" class="btn btn-primary">Set overlay</button>
+          <!--  <button id="poly-overlay" class="btn btn-primary">Set overlay</button> -->
+        </fieldset>
+        <fieldset class="hidden">
+          <legend id="import-geojson">
+            📂 Import GeoJSON
+          </legend>
+          <input type="file" id="poly-file-geojson" accept="text/json" class="btn btn-primary" style="margin-bottom: 10px;" />
+          <!--  <button id="poly-overlay" class="btn btn-primary">Set overlay</button> -->
         </fieldset>
       </div>
     </div>
-  </div>
-  <script>
-    // const POLY_METADATA = [
-    //   {
-    //     "type": "text",
-    //     "value": "Name",
-    //     "htmlId": "name",
-    //     "propertyId": "namestring",
-    //     "label": "Name or ID"
-    //   },
-    //   {
-    //     "type": "text",
-    //     "value": "Cataloguenumbers",
-    //     "htmlId": "cats",
-    //     "propertyId": "cataloguenumbers",
-    //     "label": "Calatoguenumbers (comma separated)",
-    //     "separator": ","
-    //   },
-    //   {
-    //     "type": "textarea",
-    //     "value": "Commentary",
-    //     "htmlId": "comment",
-    //     "propertyId": "commentary",
-    //     "label": "Commentary"
-    //   },
-    //   {
-    //     "type": "dropdown",
-    //     "value": "Value 1, Value 2, Value 3",
-    //     "htmlId": "select",
-    //     "propertyId": "selection",
-    //     "label": "Selection"
-    //   },
-    //   {
-    //     "type": "checkbox",
-    //     "value": "Value 1, Value 2, Value 3",
-    //     "htmlId": "check",
-    //     "propertyId": "checked",
-    //     "label": "Checkbox"
-    //   },
-    //   {
-    //     "type": "date",
-    //     "value": "1500-01-01",
-    //     "htmlId": "date-begin",
-    //     "propertyId": "post quem",
-    //     "label": "Dating (post quem)",
-    //     "min": "0500-01-01", // optional
-    //     "max": "1675-12-31" // optional
-    //   }
-    // ]
-  </script>
-  <script src="https://hou2zi0.github.io/animexgeo/JS/animexgeo.js">
-  </script>
+
+    <div id="annotation-info">
+      <h2 id="annotations-help">Annotations</h2>
+      <div id="image-info">
+      </div>
+      <ol id="annotations">
+        <li>none yet...</li>
+      </ol>
+    </div>
+    <div id="cropp">
+    </div>
+    <script type="text/javascript" src="https://hou2zi0.github.io/animexgeo/vendor/jszip/jszip.js"></script>
+    <script type="text/javascript" src="https://hou2zi0.github.io/animexgeo/JS/animexgeo.js">
+    </script>
 </body>
 
 </html>
+</body>
+
+</html>
+<!--
+<script src="https://hou2zi0.github.io/animexgeo/JS/animexgeo.js">
+</script>
+-->
