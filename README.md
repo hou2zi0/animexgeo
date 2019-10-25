@@ -1,45 +1,46 @@
 # animexgeo
 
 
-<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:0 orderedList:0 -->
-
+<!-- TOC START min:1 max:3 link:true asterisk:false update:true -->
 - [animexgeo](#animexgeo)
-	- [Annotate Images and export GeoJSON](#annotate-images-and-export-geojson)
-	- [Usage](#usage)
-		- [Adding form fields](#adding-form-fields)
-			- [Text with separator char](#text-with-separator-char)
-			- [Checkbox](#checkbox)
-			- [Date picker](#date-picker)
-		- [HTML Scaffold](#html-scaffold)
-		- [GeoJSON Export](#geojson-export)
+  - [Annotate Images and export GeoJSON](#annotate-images-and-export-geojson)
+  - [Usage](#usage)
+    - [Adding form fields](#adding-form-fields)
+  - [GeoJSON Export](#geojson-export)
+  - [Automatic Cropping of the Annotated Geometries with Canvas](#automatic-cropping-of-the-annotated-geometries-with-canvas)
+  - [Automatic Cropping of the Annotated Geometries with Pillow](#automatic-cropping-of-the-annotated-geometries-with-pillow)
+  - [Highlighting based on Metadata](#highlighting-based-on-metadata)
+  - [Global Metadata & Annotations](#global-metadata--annotations)
 - [To Do](#to-do)
 - [License](#license)
+<!-- TOC END -->
 
-<!-- /TOC -->
+
 
 ## Annotate Images and export GeoJSON
-The script allows you
-* to load images (jpg or png) into an [Leaflet.js](https://leafletjs.com/) canvas area via file dialog
-* to annotate areas with polygons (more options coming, see To Do below)
-  * the polygon may contain one hole, which can be annotated by holding the shift key while clicking
-* to configure a series of form fields and add them to the interface. The forms give you the opportunity to input various forms of metadata associated with the currently active polygon
-* export the polygons and their corresponding metadata as a geojson file (the metadata are saved as `geojson.properties`).
+The script allows you …
+* … to load images (jpg or png) into an [Leaflet.js](https://leafletjs.com/) canvas area via file dialog
+* … to annotate areas with polygons (more options coming, see To Do below)
+* … to configure a series of form fields and add them to the interface. The forms give you the opportunity to input various forms of metadata associated with the currently active polygon
+* … to export the polygons and their corresponding metadata as a geojson file (the metadata are saved as `geojson.properties`).
+* … to export a JSON file containing the data needed to slice or crop the polygons from the original image with the Pillow library. See [Automatic Cropping of the Annotated Geometries](#automatic-cropping-of-the-annotated-geometries) below.
+* to export the cropped polygons as PNG files and the associated metadata as JSON files in one ZIP file. The ZIP file contains two folders:  
+    * `images` contains the cropped polygons as PNG files.
+    * `metadata` contains the corresponding metadata as JSON files.
+* to highlight polygons based on the annotated metadata.
 
 A live example may be found [here](https://hou2zi0.github.io/animexgeo/HTML/animexgeo.html).
 
 
 ## Usage
 
-On a local machine:
-* Start a local server, e.g. via `python -m SimpleHTTPServer`, and load your HTML file.
-
-Then:
-* Load a file via the file dialog and click ‘Set overlay’ to adjust the image size to the canvas.
-* Click on the loaded image to annotate the polygon.
-* Add the form fields to the web interface to input metadata.
-* Click ‘Add polygon’ to add the polygon and its metadata to the underlying array of GeoJSON objects.
-* Click ‘Clear Active’ to erase the currently active polygon from the canvas.
-  * ‘Show’ shows all currently annotated polygons, ‘Hide’ hides all currently annotated polygons.
+* Load a file via the file dialog.
+* Add a form field to input metadata.
+* Click on the loaded image to annotate with a polygon.
+* Press the _enter key_ or click _Add polygon_ to add the polygon and its metadata to the underlying array of GeoJSON objects.
+    * The edges of the polygons are now adjustable via drag and drop.
+* Press _backspace_ or click _Clear Active_ to erase the currently active polygon from the canvas.
+    * Right clicking on a polygon erases it and its annotations.
 * Repeat the above.
 * Click ‘Export JSON’ to retrieve the array of GeoJSON objects.
 
@@ -47,6 +48,7 @@ A live example may be found [here](https://hou2zi0.github.io/animexgeo/HTML/anim
 
 ![Annotate images in Leaflet.js with customized form fields](data/img/image_annotation.png)
 
+![Annotate Carta Marina in Leaflet.js with customized form fields](data/img/add_polygons.png)
 
 ### Adding form fields
 
@@ -146,111 +148,9 @@ const POLY_METADATA = [{
 ]
 ```
 -->
-### HTML Scaffold
 
-The example uses [Bootstrap CSS](https://getbootstrap.com/docs/3.3/css/).
 
-All the fieldsets, buttons, and their corresponding IDs are required for the script to retrieve values and to set event listeners. The sequence of these elements may be changed at will.
-
-```html
-<html>
-
-<head>
-  <title>Annotate images &amp; export GeoJSON</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
-  <style>
-    fieldset {
-      margin-top: 5px;
-    }
-
-    div#mapid {
-      margin-top: 15px;
-      margin-bottom: 15px;
-    }
-
-    .hide {
-      display: none;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-    <div class="navigation">
-      <fieldset>
-        <legend>Add form field <button class="btn btn-success btn-xs" id="sub-hide-show">-</button></legend>
-        <div id="sub-fieldset">
-          <p>
-            <strong>Type</strong>:
-            <select id="sub-type">
-          <option value="textarea">Textarea</option>
-          <option value="text">Text</option>
-          <option value="dropdown">Dropdown</option>
-          <option value="checkbox">Checkbox</option>
-          <option value="date">Datepicker</option>
-        </select>
-          </p>
-          <p id="sub-type-separator"></p>
-          <p>
-            <strong>Value(s)</strong>: <input type="text" value="Value" id="sub-value" style="width:80%;"><br />
-          </p>
-          <p>
-            <strong>Label</strong>: <input type="text" value="Label" id="sub-label" style="width:80%;"><br />
-          </p>
-          <p>
-            <button class="btn btn-default" id="sub-formField">Add form field</button>
-          </p>
-        </div>
-      </fieldset>
-    </div>
-    <hr />
-    <div class="row">
-      <div class="col-lg-9">
-        <div id="mapid"></div>
-      </div>
-      <div class="col-lg-3">
-        <fieldset id="poly-data">
-          <legend>
-            Add Polygon-Properties
-          </legend>
-        </fieldset>
-        <hr />
-        <div class="row" id="poly-data-button">
-          <div class="col-lg-6">
-            <button id="poly-add" class="btn btn-lg btn-primary">Add Polygon</button>
-          </div>
-          <div class="col-lg-3">
-            <button id="poly-show" class="btn  btn-primary">Show</button>
-          </div>
-          <div class="col-lg-3">
-            <button id="poly-hide" class="btn  btn-primary">Hide</button>
-          </div>
-        </div>
-        <hr />
-        <fieldset>
-          <legend>
-            Clear &amp; Export
-          </legend>
-          <button id="poly-clear" class="btn btn-primary">Clear Active</button>
-          <button id="poly-export" class="btn btn-primary">Export JSON</button>
-        </fieldset>
-        <fieldset>
-          <legend>
-            Import image
-          </legend>
-          <input type="file" id="poly-file" accept="image/png, image/jpeg" class="btn btn-primary" style="margin-bottom: 10px;" />
-          <button id="poly-overlay" class="btn btn-primary">Set overlay</button>
-        </fieldset>
-      </div>
-    </div>
-  </div>
-  <script src="https://hou2zi0.github.io/animexgeo/JS/animexgeo.js">
-  </script>
-</body>
-
-</html>
-```
-### GeoJSON Export
+## GeoJSON Export
 
 A sample GeoJSON export is shown below.
 
@@ -311,8 +211,27 @@ A sample GeoJSON export is shown below.
     }
 }]
 ```
+## Automatic Cropping of the Annotated Geometries with Canvas
 
-## Automatic Cropping of the Annotated Geometries
+The button _Crop & Download Annotations_ downloads a ZIP file containing the cutout polygons as PNG file and the corresponding metadata as JSON files.
+
+The PNGs are stored in the `images` folder, the metadata file are stored in the `metadata` folder.
+
+```shell
+~/Downloads/Download
+ λ >>> ls images metadata
+images:
+519259657005581_cropped_from_Carta_Marina_Edited_PD_small.jpg.png
+5610363972253731_cropped_from_Carta_Marina_Edited_PD_small.jpg.png
+
+metadata:
+519259657005581.metadata.json  5610363972253731.metadata.json
+```
+
+**Important**: For security reasons your browser may prompt you if you want to keep the downloaded ZIP file.
+
+
+## Automatic Cropping of the Annotated Geometries with Pillow
 
 You may download the annotation data in a JSON-file preprocessed in order to facilitate cropping with the `Pillow`-library used for image processing in `Python`. The JSON-file looks like this:
 
@@ -375,11 +294,21 @@ for object in jsonData['croppData']:
   cropped.save(object['properties']['uid'] + '.png')
 ```
 
+## Highlighting based on Metadata
+
+A dropdown allows to highlight specific polygons based on the previously givven metadata.
+
+![Highlighting polygons based on metadata](data/img/highlight.png)
+
+## Global Metadata & Annotations
+
+Global image metadata and your metadata annotations are given below the the canvas at the foot of the site.
+
+![Metadata](data/img/metadata.png)
 
 # To Do
 
 * Provide point and multi polygon annotation.
-* Allow adjustment of polygon edges via mouse click and drag.
 * Bundle into Electron application.
 * Bundle into Atom plugin.
 * Refactor to make code more maintainable.
