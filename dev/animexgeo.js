@@ -504,6 +504,7 @@ ${html.join('\n')}
         .dataset.width;
       const filename = document.getElementById("image-info")
         .dataset.filename;
+      var zip = new JSZip();
 
       FEATURES.eachLayer((layer) => {
         if (layer.feature.geometry.type == 'Polygon') {
@@ -538,21 +539,58 @@ ${html.join('\n')}
           document.getElementById('cropp')
             .appendChild(canvas);
           //console.log(canvas.toDataURL("image/png"));
+          /*
+                    const element = document.createElement('a');
+                    element.setAttribute('href', canvas.toDataURL("image/png"));
+                    element.setAttribute('download', `${croppData.properties.uid}_cropped_from_${filename}.png`);
+                    element.style.display = 'none';
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+                    canvas.remove();
 
-          const element = document.createElement('a');
-          element.setAttribute('href', canvas.toDataURL("image/png"));
-          element.setAttribute('download', `${croppData.properties.uid}_cropped_from_${filename}.png`);
-          element.style.display = 'none';
-          document.body.appendChild(element);
-          element.click();
-          document.body.removeChild(element);
-          canvas.remove();
+                    prepareDownload({
+                      "file": `${croppData.properties.uid}.metadata.json`,
+                      "properties": croppData.properties
+                    }, `${croppData.properties.uid}.metadata.json`, 'raw');
+          */
+          var j = {
+            "file": `${croppData.properties.uid}.metadata.json`,
+            "properties": croppData.properties
+          };
+
+
+
+          zip.folder("metadata")
+            .file(`${croppData.properties.uid}.metadata.json`, JSON.stringify(j));
+
+          zip.folder("images")
+            .file(`${croppData.properties.uid}_cropped_from_${filename}.png`, canvas.toDataURL("image/png")
+              .substr(canvas.toDataURL("image/png")
+                .indexOf(',') + 1), {
+                base64: true
+              });
+          // data:application/zip;base64,
         }
-
       });
 
-    });
+      zip.generateAsync({
+          type: "base64"
+        })
+        .then(function(content) {
+          window.location = "data:application/zip;base64," + content;
+        });
 
+    });
+  /*
+  function create_zip() {
+  	var zip = new JSZip();
+  	zip.add("hello1.txt", "Hello First World\n");
+  	zip.add("hello2.txt", "Hello Second World\n");
+  	content = zip.generate();
+  	location.href="data:application/zip;base64," + content;
+  }
+  */
   function prepareDownload(data, filename, type) {
     const imageInfo = document.getElementById("image-info");
     let content;
