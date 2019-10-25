@@ -570,6 +570,7 @@ ${html.join('\n')}
                 .indexOf(',') + 1), {
                 base64: true
               });
+          canvas.remove();
           // data:application/zip;base64,
         }
       });
